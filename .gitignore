@@ -1,0 +1,23 @@
+# Datos locales (BD de desarrollo, logs)
+.local/
+
+# Backend
+backend/target/
+backend/target-*/
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# IDE y sistema
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Nunca versionar secretos ni datos reales
+.env
+*.env.local

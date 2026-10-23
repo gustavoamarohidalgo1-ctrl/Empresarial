@@ -1,0 +1,98 @@
+:host {
+  display: block;
+}
+
+.insignia {
+  --icono-tamano: 0.875rem;
+}
+
+.buzon {
+  max-width: 52rem;
+}
+
+.buzon__estado {
+  margin-bottom: var(--e-3);
+}
+
+.buzon__lista {
+  display: grid;
+  gap: var(--e-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.buzon__correo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+
+.buzon__cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-3);
+}
+
+.buzon__icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-control);
+  background: var(--c-primario-suave);
+  color: var(--c-primario-fuerte);
+}
+
+.buzon__titulos {
+  min-width: 0;
+}
+
+.tarjeta .buzon__asunto {
+  margin: 0 0 var(--e-1);
+  font-size: var(--t-16);
+}
+
+.buzon__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-1) var(--e-4);
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+}
+
+.buzon__meta div {
+  display: flex;
+  gap: var(--e-1);
+  min-width: 0;
+}
+
+.buzon__meta dt {
+  font-weight: 600;
+}
+
+.buzon__meta dt::after {
+  content: ':';
+}
+
+.buzon__meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.buzon__cuerpo {
+  margin: 0;
+  padding: var(--e-3) var(--e-4);
+  border-left: 3px solid var(--c-primario-borde);
+  border-radius: var(--r-sm);
+  background: var(--c-superficie-2);
+  font-size: var(--t-14);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.buzon__correo .tarjeta__pie {
+  margin-top: var(--e-1);
+}

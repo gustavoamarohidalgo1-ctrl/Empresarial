@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.registro__avisos:not(:empty) {
+  margin-bottom: var(--e-5);
+}
+
+.registro__generales {
+  margin: var(--e-2) 0 0;
+  padding-left: var(--e-5);
+}
+
+.registro__obligatorios {
+  margin-bottom: var(--e-4);
+}
+
+.registro__grupo {
+  min-width: 0;
+  margin: 0 0 var(--e-2);
+  padding: 0;
+  border: 0;
+}
+
+.registro__leyenda {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  width: 100%;
+  margin-bottom: var(--e-4);
+  padding: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.registro__leyenda::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--c-borde);
+}
+
+.registro__fila {
+  display: grid;
+  gap: 0 var(--e-4);
+}
+
+@media (min-width: 36rem) {
+  .registro__fila {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.registro__consentimiento {
+  margin-top: var(--e-2);
+}
+
+.registro__consentimiento .casilla {
+  font-size: var(--t-14);
+  font-weight: 500;
+}
+
+.registro__enviar {
+  margin-top: var(--e-2);
+}
+
+/* Cargando: el texto sigue visible («Creando tu cuenta…») con el spinner delante. */
+.registro__enviar.btn--cargando {
+  color: var(--btn-texto);
+}
+
+.registro__enviar.btn--cargando::after {
+  position: static;
+  order: -1;
+  margin: 0;
+}
+
+.registro__estado {
+  text-align: center;
+}
+
+.registro__pie {
+  margin: var(--e-6) 0 0;
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--c-borde);
+  color: var(--c-texto-2);
+  text-align: center;
+}
+
+.registro__pie a {
+  font-weight: 600;
+}

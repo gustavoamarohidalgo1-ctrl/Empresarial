@@ -1,0 +1,312 @@
+<app-documento
+  antetitulo="Protección de datos personales"
+  titulo="Política de privacidad"
+  resumen="Te explicamos, en lenguaje claro, qué datos personales trata SIGA-SP, para qué los usa, cómo los protege y cómo puedes ejercer tus derechos."
+  [version]="version"
+  [indice]="indice"
+>
+  <div class="doc__destacado">
+    <p><strong>En resumen</strong></p>
+    <ul>
+      <li>Usamos tus datos solo para gestionar tus citas ambulatorias y avisarte de ellas.</li>
+      <li>No vendemos tus datos ni los usamos para publicidad.</li>
+      <li>
+        Tus citas pueden revelar información de tu salud: la tratamos como dato sensible, con tu
+        consentimiento expreso y acceso restringido.
+      </li>
+      <li>No guardamos tu historia clínica, diagnósticos ni resultados de exámenes.</li>
+      <li>Puedes acceder a tus datos, corregirlos, pedir su eliminación u oponerte a su uso.</li>
+    </ul>
+  </div>
+
+  <section aria-labelledby="privacidad-responsable">
+    <h2 id="privacidad-responsable" tabindex="-1">1. Quién trata tus datos</h2>
+    <p>
+      SIGA-SP es la plataforma de gestión de citas de atención ambulatoria con la que reservas,
+      confirmas, reprogramas o cancelas tus citas y recibes recordatorios. El responsable del
+      tratamiento es la entidad de salud que opera SIGA-SP en tu sede, que decide sobre la finalidad
+      y el uso de los datos conforme a esta política.
+    </p>
+    <p>
+      Esta política se aplica a los datos que ingresas al crear tu cuenta y a los que se generan
+      cuando usas SIGA-SP. Se rige por la Ley N.º 29733, Ley de Protección de Datos Personales, y su
+      reglamento, aprobado por el Decreto Supremo N.º 016-2024-JUS.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-datos">
+    <h2 id="privacidad-datos" tabindex="-1">2. Qué datos tratamos</h2>
+    <ul class="doc__rejilla">
+      <li>
+        <strong><app-icono nombre="user" /> Identificación</strong>
+        <p>Nombres y apellidos.</p>
+      </li>
+      <li>
+        <strong><app-icono nombre="mail" /> Contacto</strong>
+        <p>Correo electrónico y teléfono celular.</p>
+      </li>
+      <li>
+        <strong><app-icono nombre="calendar" /> Tus citas</strong>
+        <p>
+          Especialidad, profesional, sede, fecha y hora, estado de la cita, confirmaciones,
+          pre-check-in, llegada y motivos de cancelación o reprogramación.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="lock" /> Cuenta y seguridad</strong>
+        <p>
+          Contraseña (protegida con hash, nunca se guarda tal cual), fecha y versión de esta
+          política que aceptaste, y registros de seguridad: fecha, hora y tipo de operación
+          realizada.
+        </p>
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-sensibles">
+    <h2 id="privacidad-sensibles" tabindex="-1">3. Datos sensibles: tu salud</h2>
+    <p>
+      La Ley N.º 29733 considera <strong>datos sensibles</strong> los datos relacionados con la
+      salud. En SIGA-SP lo son:
+    </p>
+    <ul class="doc__lista-iconos">
+      <li>
+        <app-icono nombre="stethoscope" />
+        <span
+          >La <strong>especialidad</strong> de cada cita y el <strong>profesional</strong> que te
+          atiende, porque pueden revelar un problema de salud.</span
+        >
+      </li>
+      <li>
+        <app-icono nombre="heart-pulse" />
+        <span
+          >Los <strong>datos de tu atención</strong>: confirmación, pre-check-in, llegada a la sede,
+          espera, inicio y fin de la atención, inasistencias y motivos de cancelación o
+          reprogramación.</span
+        >
+      </li>
+    </ul>
+    <h3>Cómo los tratamos</h3>
+    <ul>
+      <li>
+        <strong>Con tu consentimiento expreso y por escrito</strong>, que das por medios
+        electrónicos al marcar la casilla de aceptación cuando creas tu cuenta. Sin él no creamos la
+        cuenta.
+      </li>
+      <li>
+        <strong>Solo para tu atención</strong>: gestionar tus citas, avisarte de ellas y organizar
+        la atención en la sede. No los usamos para publicidad, perfiles comerciales ni decisiones
+        automatizadas.
+      </li>
+      <li>
+        <strong>Con acceso restringido</strong>: solo el personal autorizado de tu sede los ve, y
+        solo lo que necesita para su función. Cada operación sobre una cita queda registrada en la
+        bitácora de auditoría.
+      </li>
+      <li>
+        <strong>Sin identificarte en las estadísticas</strong>: los indicadores del servicio usan
+        datos agregados, sin nombres ni datos de contacto.
+      </li>
+      <li>
+        <strong>Sin cederlos</strong>: no los compartimos con aseguradoras, empleadores ni otros
+        terceros, salvo que una norma o un mandato judicial lo exija.
+      </li>
+    </ul>
+    <p>
+      SIGA-SP <strong>no</strong> almacena tu historia clínica, diagnósticos, tratamientos ni
+      resultados de exámenes.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-finalidades">
+    <h2 id="privacidad-finalidades" tabindex="-1">4. Para qué los usamos</h2>
+    <ul>
+      <li>Crear y administrar tu cuenta, e identificarte al iniciar sesión.</li>
+      <li>Reservar, confirmar, reprogramar y cancelar tus citas, y mostrarte su historial.</li>
+      <li>
+        Enviarte recordatorios antes de cada cita y avisos cuando una cita cambia, por los canales
+        que registraste.
+      </li>
+      <li>Registrar tu pre-check-in y tu llegada a la sede para organizar la atención.</li>
+      <li>
+        Elaborar indicadores agregados (por ejemplo, tasas de confirmación o de inasistencia) que
+        ayudan a mejorar el servicio. Estos indicadores no identifican a ninguna persona.
+      </li>
+      <li>Proteger tu cuenta, prevenir usos indebidos y dejar constancia de cada operación.</li>
+    </ul>
+    <p>
+      No usamos tus datos para fines distintos de los descritos, ni para publicidad, ni para tomar
+      decisiones automatizadas que te afecten.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-base-legal">
+    <h2 id="privacidad-base-legal" tabindex="-1">5. Base legal</h2>
+    <p>
+      Tratamos tus datos con tu <strong>consentimiento</strong>, que otorgas de forma previa,
+      informada, expresa e inequívoca al marcar la casilla de aceptación cuando creas tu cuenta.
+      Para los datos de salud, que son sensibles, ese consentimiento es además por escrito: lo das
+      por medios electrónicos con la misma casilla. Guardamos la fecha en que lo diste y la versión
+      de esta política que aceptaste.
+    </p>
+    <p>
+      Puedes <strong>revocar tu consentimiento</strong> en cualquier momento. La revocación no
+      afecta el tratamiento realizado antes y, como los datos son necesarios para gestionar tus
+      citas, implica cerrar tu cuenta.
+    </p>
+    <p>
+      Algunos registros se conservan, además, para cumplir obligaciones legales o atender reclamos,
+      siempre dentro de lo que permite la Ley N.º 29733 y su reglamento (D.S. N.º 016-2024-JUS).
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-destinatarios">
+    <h2 id="privacidad-destinatarios" tabindex="-1">6. Con quién los compartimos</h2>
+    <ul>
+      <li>
+        <strong>Personal autorizado de la sede</strong> (admisión y profesionales), solo con los
+        datos necesarios para atenderte.
+      </li>
+      <li>
+        <strong>Proveedores de servicios tecnológicos</strong> que alojan o mantienen la plataforma,
+        como encargados del tratamiento, con obligaciones de confidencialidad y seguridad.
+      </li>
+      <li>
+        <strong>Autoridades competentes</strong>, cuando una norma o un mandato judicial lo exija.
+      </li>
+    </ul>
+    <p>No vendemos ni cedemos tus datos a terceros con fines comerciales.</p>
+  </section>
+
+  <section aria-labelledby="privacidad-conservacion">
+    <h2 id="privacidad-conservacion" tabindex="-1">7. Cuánto tiempo los conservamos</h2>
+    <ul>
+      <li>Los datos de tu cuenta y tus citas, mientras tu cuenta esté activa.</li>
+      <li>
+        Al cerrar tu cuenta, los datos se bloquean y se conservan solo el tiempo necesario para
+        cumplir obligaciones legales; luego se eliminan o se anonimizan.
+      </li>
+      <li>
+        Los enlaces para restablecer la contraseña vencen a los 30 minutos y solo sirven una vez.
+      </li>
+      <li>
+        Los registros de seguridad se conservan el tiempo necesario para investigar incidentes y
+        demostrar el correcto tratamiento de los datos.
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-seguridad">
+    <h2 id="privacidad-seguridad" tabindex="-1">8. Cómo los protegemos</h2>
+    <ul class="doc__lista-iconos">
+      <li>
+        <app-icono nombre="lock" />
+        <span
+          >Tu contraseña se guarda protegida con hash, una transformación irreversible: nadie puede
+          leerla, ni siquiera el personal de SIGA-SP.</span
+        >
+      </li>
+      <li>
+        <app-icono nombre="shield-check" />
+        <span
+          >La conexión viaja cifrada y la sesión usa una cookie protegida que no es accesible desde
+          otros sitios ni desde código de terceros.</span
+        >
+      </li>
+      <li>
+        <app-icono nombre="alert-triangle" />
+        <span
+          >Tras varios intentos fallidos de inicio de sesión, la cuenta se bloquea temporalmente
+          para impedir ataques de adivinación.</span
+        >
+      </li>
+      <li>
+        <app-icono nombre="users" />
+        <span
+          >Cada perfil (paciente, admisión, responsables y administración) solo accede a lo que
+          necesita para su función.</span
+        >
+      </li>
+      <li>
+        <app-icono nombre="file-text" />
+        <span>Cada operación sobre una cita queda registrada en una bitácora de auditoría.</span>
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-cookies">
+    <h2 id="privacidad-cookies" tabindex="-1">9. Cookies y almacenamiento</h2>
+    <p>Usamos solo cookies técnicas, necesarias para que SIGA-SP funcione de forma segura:</p>
+    <ul>
+      <li><strong>Sesión</strong>: mantiene tu sesión iniciada y se elimina al cerrarla.</li>
+      <li>
+        <strong>Protección de formularios</strong>: evita que otros sitios envíen solicitudes en tu
+        nombre.
+      </li>
+    </ul>
+    <p>
+      Tu preferencia de tema (claro u oscuro) se guarda solo en tu navegador. No usamos cookies de
+      publicidad ni de analítica de terceros.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-derechos">
+    <h2 id="privacidad-derechos" tabindex="-1">10. Tus derechos (ARCO)</h2>
+    <p>
+      Como titular de tus datos personales, puedes ejercer en cualquier momento tus derechos de:
+    </p>
+    <ul class="doc__rejilla">
+      <li>
+        <strong>Acceso</strong>
+        <p>Saber qué datos tuyos tratamos, cómo los obtuvimos y para qué los usamos.</p>
+      </li>
+      <li>
+        <strong>Rectificación</strong>
+        <p>Actualizar o corregir datos inexactos o incompletos.</p>
+      </li>
+      <li>
+        <strong>Cancelación</strong>
+        <p>Pedir que eliminemos tus datos cuando ya no sean necesarios.</p>
+      </li>
+      <li>
+        <strong>Oposición</strong>
+        <p>Oponerte a un tratamiento por un motivo legítimo y fundado.</p>
+      </li>
+    </ul>
+    <p>También puedes revocar tu consentimiento y solicitar información sobre el tratamiento.</p>
+
+    <h3>Cómo ejercerlos</h3>
+    <ol>
+      <li>
+        Tu correo y tu teléfono puedes actualizarlos tú mismo en
+        <a routerLink="/paciente/perfil">Mi perfil</a>, con efecto inmediato.
+      </li>
+      <li>
+        Para los demás derechos, presenta una solicitud escrita en el área de admisión de tu sede.
+        Indica tu nombre completo, tu documento de identidad, el derecho que deseas ejercer y un
+        medio de contacto para responderte.
+      </li>
+      <li>
+        Atenderemos tu solicitud de forma gratuita y dentro de los plazos que establece el
+        reglamento de la Ley N.º 29733.
+      </li>
+    </ol>
+    <p>
+      Si consideras que no atendimos tu solicitud como corresponde, puedes presentar una reclamación
+      ante la Autoridad Nacional de Protección de Datos Personales del Ministerio de Justicia y
+      Derechos Humanos.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-cambios">
+    <h2 id="privacidad-cambios" tabindex="-1">11. Cambios a esta política</h2>
+    <p>
+      Esta es la versión {{ version.numero }} de la política, vigente desde el
+      {{ version.vigenteDesde }}. Si la cambiamos, publicaremos la nueva versión en esta página con
+      su número y su fecha de vigencia. Al crear tu cuenta guardamos qué versión aceptaste; si un
+      cambio afecta la forma en que usamos tus datos, te lo informaremos y, cuando corresponda, te
+      pediremos nuevamente tu consentimiento.
+    </p>
+    <p>Consulta también nuestra <a routerLink="/accesibilidad">declaración de accesibilidad</a>.</p>
+  </section>
+</app-documento>

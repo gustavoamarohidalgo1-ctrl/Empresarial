@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.restablecer__avisos:not(:empty) {
+  margin-bottom: var(--e-4);
+}
+
+.restablecer__estado {
+  text-align: center;
+}
+
+.restablecer__sello {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--e-4);
+  border-radius: 50%;
+  background: var(--c-advertencia-suave);
+  color: var(--c-advertencia);
+}
+
+.restablecer__invalido .acciones {
+  margin-top: var(--e-5);
+}
+
+.restablecer__pie {
+  margin: var(--e-6) 0 0;
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--c-borde);
+  text-align: center;
+}
+
+.restablecer__pie a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: var(--alto-control);
+  font-weight: 600;
+  --icono-tamano: 1rem;
+}

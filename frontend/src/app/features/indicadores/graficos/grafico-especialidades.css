@@ -1,0 +1,146 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.gesp {
+  position: relative;
+  container-type: inline-size;
+}
+
+.gesp__encabezado,
+.gesp__fila {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--e-1) var(--e-4);
+}
+
+.gesp__encabezado {
+  padding: 0 var(--e-2) var(--e-2);
+  border-bottom: 1px solid var(--c-borde);
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  font-weight: 600;
+}
+
+.gesp__encabezado > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.gesp__clave {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.gesp__clave--total,
+.gesp__total {
+  background: var(--c-primario);
+  fill: var(--c-primario);
+}
+
+.gesp__clave--tasa,
+.gesp__tasa {
+  background: var(--estado-no-asistio);
+  fill: var(--estado-no-asistio);
+}
+
+.gesp__filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gesp__fila {
+  min-height: 2.75rem;
+  padding: var(--e-1) var(--e-2);
+  border-bottom: 1px solid var(--c-borde);
+  border-radius: var(--r-sm);
+  outline-offset: -3px;
+}
+
+.gesp__fila:last-child {
+  border-bottom: 0;
+}
+
+.gesp__fila--activa {
+  background: var(--c-primario-tenue);
+}
+
+.gesp__nombre {
+  min-width: 0;
+  font-size: var(--t-14);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.gesp__barra {
+  display: block;
+  overflow: visible;
+}
+
+.gesp__cifra {
+  fill: var(--c-texto);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.gesp__cifra--nc {
+  fill: var(--c-texto-2);
+  font-weight: 500;
+}
+
+.gesp__tooltip {
+  position: absolute;
+  z-index: 2;
+  left: 30%;
+  width: min(15rem, 70%);
+  padding: var(--e-3);
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-control);
+  background: var(--c-superficie-elevada);
+  box-shadow: var(--sombra-3);
+  font-size: var(--t-13);
+  pointer-events: none;
+}
+
+.gesp__tooltip-titulo {
+  margin: 0 0 var(--e-1);
+  font-weight: 600;
+}
+
+/* Angosto: el nombre ocupa su propia línea y los dos paneles van debajo. */
+@container (max-width: 30rem) {
+  .gesp__encabezado,
+  .gesp__fila {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .gesp__encabezado > span:first-child {
+    display: none;
+  }
+
+  .gesp__nombre {
+    grid-column: 1 / -1;
+  }
+
+  .gesp__tooltip {
+    left: var(--e-2);
+    width: calc(100% - var(--e-4));
+  }
+}
+
+@media (forced-colors: active) {
+  .gesp__total,
+  .gesp__tasa {
+    fill: CanvasText;
+  }
+
+  .gesp__cifra {
+    fill: CanvasText;
+  }
+}

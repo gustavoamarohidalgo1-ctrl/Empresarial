@@ -1,0 +1,127 @@
+/* Tarjeta centrada con pasos numerados; la aclaración va antes de la acción. */
+.centrada {
+  max-width: 42rem;
+  margin-inline: auto;
+}
+
+.cita {
+  margin-bottom: var(--e-6);
+  padding-bottom: var(--e-5);
+  border-bottom: 1px solid var(--c-borde);
+}
+
+.pasos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.paso {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: var(--e-3);
+  padding-bottom: var(--e-8);
+}
+
+.paso:last-child {
+  padding-bottom: 0;
+}
+
+/* Conector vertical entre pasos. */
+.paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  bottom: var(--e-2);
+  left: calc(1rem - 1px);
+  border-left: 2px solid var(--c-borde);
+}
+
+.paso__numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--c-primario);
+  color: var(--c-sobre-primario);
+  font-size: var(--t-14);
+  font-weight: 700;
+  --icono-tamano: 1rem;
+}
+
+.paso--despues .paso__numero {
+  border: 1px dashed var(--c-borde-control);
+  background: var(--c-superficie);
+  color: var(--c-texto-2);
+}
+
+.paso__cuerpo {
+  min-width: 0;
+}
+
+.tarjeta .paso__titulo {
+  margin: 0.25rem 0 var(--e-2);
+  font-size: var(--t-18);
+}
+
+.titular {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin-bottom: var(--e-4);
+  padding: var(--e-2) var(--e-3);
+  border-radius: var(--r-control);
+  background: var(--c-superficie-2);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  --icono-tamano: 1rem;
+}
+
+.titular .texto-suave {
+  font-weight: 500;
+}
+
+.casilla--grande {
+  margin-block: var(--e-4);
+  padding: var(--e-4);
+  font-size: var(--t-16);
+}
+
+@media (min-width: 36rem) {
+  .paso {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--e-4);
+  }
+
+  .paso__numero {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .paso:not(:last-child)::before {
+    top: 2.75rem;
+    left: calc(1.125rem - 1px);
+  }
+}
+
+/* Esqueleto: mismas medidas que el resumen y los pasos. */
+.esqueleto-cita {
+  flex-wrap: nowrap;
+  gap: var(--e-4);
+  margin-bottom: var(--e-6);
+}
+
+.esqueleto-cita > app-esqueleto {
+  flex: none;
+}
+
+.esqueleto-pila {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--e-3);
+  min-width: 0;
+}

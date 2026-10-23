@@ -1,0 +1,193 @@
+<app-encabezado-pagina titulo="Notificaciones" [subtitulo]="subtitulo()">
+  @if (carga() === 'listo' && lista().length > 0) {
+    <button
+      acciones
+      type="button"
+      class="btn"
+      [class.btn--cargando]="marcandoTodas()"
+      [disabled]="noLeidas() === 0 && !marcandoTodas()"
+      [attr.aria-disabled]="marcandoTodas() || null"
+      [attr.aria-describedby]="noLeidas() === 0 ? 'explicacion-marcar' : null"
+      (click)="marcarTodas()"
+    >
+      <app-icono nombre="check-check" /> Marcar todas como leídas
+    </button>
+  }
+</app-encabezado-pagina>
+
+<div aria-live="polite" aria-atomic="true">
+  @if (resultado(); as r) {
+    <div #avisoResultado class="foco-resultado resultado" tabindex="-1">
+      <app-aviso [tipo]="r.tipo" [titulo]="r.titulo"
+        ><p>{{ r.texto }}</p></app-aviso
+      >
+    </div>
+  }
+</div>
+
+@if (carga() === 'listo' && lista().length > 0) {
+  <div class="barra">
+    <div class="segmentado" role="group" aria-label="Mostrar notificaciones">
+      <button
+        type="button"
+        class="segmentado__opcion"
+        [attr.aria-pressed]="filtro() === 'todas'"
+        (click)="filtrar('todas')"
+      >
+        Todas
+      </button>
+      <button
+        type="button"
+        class="segmentado__opcion"
+        [attr.aria-pressed]="filtro() === 'no-leidas'"
+        (click)="filtrar('no-leidas')"
+      >
+        No leídas
+        @if (noLeidas() > 0) {
+          <span class="insignia insignia--marca tabular">{{ noLeidas() }}</span>
+        }
+      </button>
+    </div>
+    @if (actualizando()) {
+      <span class="actualizando" aria-hidden="true">
+        <app-icono nombre="refresh-cw" /> Actualizando…
+      </span>
+    }
+    @if (noLeidas() === 0) {
+      <p id="explicacion-marcar" class="solo-lectores">No hay notificaciones sin leer.</p>
+    }
+  </div>
+}
+
+<div class="panel" [attr.aria-busy]="carga() === 'cargando'">
+  <p class="solo-lectores" aria-live="polite">{{ resumen() }}</p>
+
+  @switch (carga()) {
+    @case ('cargando') {
+      <p class="solo-lectores" role="status">Cargando tus notificaciones…</p>
+      <div aria-hidden="true">
+        <div class="barra"><app-esqueleto forma="boton" ancho="14rem" /></div>
+        <app-esqueleto class="grupo__titulo" forma="titulo" ancho="5rem" />
+        <ul class="lista tarjeta">
+          @for (i of [1, 2, 3, 4]; track i) {
+            <li class="notif">
+              <app-esqueleto forma="circulo" ancho="2.5rem" alto="2.5rem" />
+              <div class="notif__cuerpo">
+                <app-esqueleto forma="titulo" ancho="55%" />
+                <app-esqueleto [lineas]="2" />
+                <app-esqueleto ancho="35%" />
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    @case ('error') {
+      <div class="tarjeta" role="alert">
+        <app-estado-vacio
+          ilustracion="error"
+          titulo="No pudimos cargar tus notificaciones"
+          [texto]="errorCarga()"
+        >
+          <button acciones type="button" class="btn btn--primario" (click)="cargar()">
+            <app-icono nombre="refresh-cw" /> Reintentar
+          </button>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('listo') {
+      @if (desactualizado()) {
+        <app-aviso
+          class="desactualizado"
+          tipo="advertencia"
+          titulo="Mostramos lo último que cargamos"
+        >
+          <p>No pudimos actualizar tus notificaciones. Revisa tu conexión e inténtalo de nuevo.</p>
+          <div class="acciones">
+            <button type="button" class="btn btn--sm" (click)="cargar()">
+              <app-icono nombre="refresh-cw" /> Volver a intentar
+            </button>
+          </div>
+        </app-aviso>
+      }
+
+      @if (grupos().length > 0) {
+        @for (g of grupos(); track g.clave) {
+          <section class="grupo" [attr.aria-labelledby]="'grupo-' + g.clave">
+            <h2 class="grupo__titulo" [id]="'grupo-' + g.clave">{{ g.titulo }}</h2>
+            <ul class="lista tarjeta">
+              @for (n of g.notificaciones; track n.id) {
+                <li class="notif" [class.notif--no-leida]="!n.leida">
+                  <span
+                    class="notif__icono"
+                    [class.notif__icono--cambio]="n.tipo === 'CAMBIO'"
+                    aria-hidden="true"
+                    ><app-icono [nombre]="icono(n.tipo)"
+                  /></span>
+                  <div class="notif__cuerpo">
+                    <div class="notif__cabecera">
+                      <h3 class="notif__titulo">
+                        <a
+                          class="enlace-extendido notif__enlace"
+                          [routerLink]="['/paciente/citas', n.citaId]"
+                          (click)="abrir(n)"
+                        >
+                          @if (!n.leida) {
+                            <span class="solo-lectores">No leída: </span>
+                          }
+                          {{ n.titulo }}</a
+                        >
+                      </h3>
+                      <time class="notif__hora tabular" [attr.datetime]="n.creadaEn">{{
+                        n.creadaEn | fechaLima: 'hora'
+                      }}</time>
+                    </div>
+                    <p class="notif__mensaje">{{ n.mensaje }}</p>
+                    <div class="notif__pie">
+                      <span class="notif__tipo">{{ etiqueta(n.tipo) }}</span>
+                      <span class="notif__codigo"
+                        ><span class="solo-lectores">Cita </span>{{ n.citaCodigo }}</span
+                      >
+                      @if (!n.leida) {
+                        <span class="insignia insignia--marca notif__nueva" aria-hidden="true">
+                          <span class="notif__punto"></span>No leída
+                        </span>
+                      }
+                      <span class="notif__ver" aria-hidden="true"
+                        >Ver cita <app-icono nombre="chevron-right"
+                      /></span>
+                    </div>
+                  </div>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      } @else if (lista().length > 0) {
+        <div class="tarjeta">
+          <app-estado-vacio
+            ilustracion="historial"
+            titulo="Estás al día"
+            texto="No tienes notificaciones sin leer."
+          >
+            <button acciones type="button" class="btn" (click)="filtrar('todas')">
+              <app-icono nombre="bell" /> Ver todas
+            </button>
+          </app-estado-vacio>
+        </div>
+      } @else {
+        <div class="tarjeta">
+          <app-estado-vacio
+            ilustracion="historial"
+            titulo="Aún no tienes notificaciones"
+            texto="Aquí verás los recordatorios de tus citas y cualquier cambio de fecha, hora o estado."
+          >
+            <a acciones class="btn btn--primario" routerLink="/paciente/reservar">
+              <app-icono nombre="calendar-plus" /> Reservar cita
+            </a>
+          </app-estado-vacio>
+        </div>
+      }
+    }
+  }
+</div>

@@ -1,0 +1,129 @@
+<app-documento
+  antetitulo="Declaración de accesibilidad"
+  titulo="Accesibilidad"
+  resumen="Queremos que cualquier persona pueda reservar y gestionar sus citas, use o no tecnologías de apoyo. Así trabajamos para lograrlo."
+  actualizado="23 de octubre de 2026"
+  [indice]="indice"
+>
+  <section aria-labelledby="accesibilidad-compromiso">
+    <h2 id="accesibilidad-compromiso" tabindex="-1">1. Nuestro compromiso</h2>
+    <p>
+      SIGA-SP se diseña y se desarrolla para cumplir las
+      <strong>Pautas de Accesibilidad para el Contenido Web (WCAG) 2.2, nivel AA</strong>, del W3C.
+      Aplicamos estas pautas desde el diseño de cada pantalla y las verificamos antes de publicar
+      cada versión.
+    </p>
+    <div class="doc__destacado">
+      <p>
+        La accesibilidad es una mejora continua. Si algo no te funciona, no es tu culpa: cuéntanos y
+        lo corregiremos.
+      </p>
+    </div>
+  </section>
+
+  <section aria-labelledby="accesibilidad-funciones">
+    <h2 id="accesibilidad-funciones" tabindex="-1">2. Funciones de accesibilidad</h2>
+    <ul class="doc__rejilla">
+      <li>
+        <strong><app-icono nombre="monitor" /> Teclado completo</strong>
+        <p>
+          Todo se puede usar sin ratón, con un orden lógico, foco siempre visible y el enlace
+          «Saltar al contenido» al inicio de cada página.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="users" /> Lectores de pantalla</strong>
+        <p>
+          Títulos de página únicos, estructura de encabezados, regiones identificadas y anuncios de
+          los resultados de cada acción.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="eye" /> Contraste y color</strong>
+        <p>
+          Contraste mínimo de 4,5:1 en textos y 3:1 en controles, verificado en el tema claro y en
+          el oscuro. Los estados de las citas usan icono y texto, nunca solo color.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="moon" /> Tema claro u oscuro</strong>
+        <p>
+          Se adapta a la preferencia de tu dispositivo o puedes elegirlo desde el menú de usuario.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="search" /> Ampliación y reflujo</strong>
+        <p>
+          El contenido se adapta hasta 320 px de ancho y admite zoom del 200 % sin perder
+          información ni obligarte a desplazarte en horizontal.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="check-circle" /> Formularios claros</strong>
+        <p>
+          Etiquetas visibles, ejemplos de formato, errores explicados junto a cada campo y
+          compatibilidad con gestores de contraseñas.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="refresh-cw" /> Movimiento reducido</strong>
+        <p>
+          Si tu dispositivo pide reducir el movimiento, omitimos las animaciones y transiciones.
+        </p>
+      </li>
+      <li>
+        <strong><app-icono nombre="clock" /> Horarios sin ambigüedad</strong>
+        <p>
+          Todas las fechas y horas se muestran en hora de Lima, con el día escrito completo para los
+          lectores de pantalla.
+        </p>
+      </li>
+    </ul>
+    <p>
+      Los botones y enlaces tienen un área táctil de al menos 44 × 44 píxeles para facilitar su uso
+      en pantallas táctiles.
+    </p>
+  </section>
+
+  <section aria-labelledby="accesibilidad-compatibilidad">
+    <h2 id="accesibilidad-compatibilidad" tabindex="-1">3. Compatibilidad</h2>
+    <p>SIGA-SP funciona en las versiones recientes de:</p>
+    <ul>
+      <li>Navegadores: Chrome, Edge, Firefox y Safari, en computadora y en celular.</li>
+      <li>
+        Lectores de pantalla: NVDA y JAWS (Windows), VoiceOver (macOS e iOS) y TalkBack (Android).
+      </li>
+      <li>Herramientas del sistema: zoom, contraste alto y ampliación de texto.</li>
+    </ul>
+    <p>No necesitas instalar ninguna aplicación: basta con un navegador actualizado.</p>
+  </section>
+
+  <section aria-labelledby="accesibilidad-evaluacion">
+    <h2 id="accesibilidad-evaluacion" tabindex="-1">4. Cómo lo evaluamos</h2>
+    <ul>
+      <li>Revisión manual de cada pantalla con teclado y con lector de pantalla.</li>
+      <li>Verificación automática del contraste de todos los colores en ambos temas.</li>
+      <li>Verificaciones automáticas de nombres accesibles, etiquetas, foco y anuncios.</li>
+      <li>Revisión del diseño adaptable en celular, tableta y computadora.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="accesibilidad-contacto">
+    <h2 id="accesibilidad-contacto" tabindex="-1">5. Reporta una barrera</h2>
+    <p>
+      Si encuentras una parte de SIGA-SP que no puedes usar, o necesitas la información en otro
+      formato, comunícalo en el área de admisión de tu sede o al personal que te atiende. Para que
+      podamos ayudarte mejor, indica:
+    </p>
+    <ul>
+      <li>la página o la función con la que tuviste el problema;</li>
+      <li>qué intentabas hacer y qué ocurrió;</li>
+      <li>el navegador, el dispositivo y, si la usas, la tecnología de apoyo.</li>
+    </ul>
+    <p>
+      Mientras lo resolvemos, el personal de admisión puede gestionar tu cita contigo. Revisa
+      también cómo tratamos tus datos en nuestra
+      <a routerLink="/privacidad">política de privacidad</a>.
+    </p>
+  </section>
+</app-documento>

@@ -1,0 +1,354 @@
+<app-encabezado-pagina
+  titulo="Bitácora"
+  subtitulo="Registro de auditoría de las acciones en SIGA-SP: quién hizo qué, cuándo y con qué resultado. Horas de Lima."
+>
+  <span junto-al-titulo class="insignia"><app-icono nombre="lock" /> Solo lectura</span>
+</app-encabezado-pagina>
+
+<p class="solo-lectores" role="status">{{ anuncio() }}</p>
+
+<div class="pila pila--lg">
+  <!-- Filtros -->
+  <section class="tarjeta bit__filtros" aria-labelledby="bitacora-filtros-titulo">
+    <h2 id="bitacora-filtros-titulo" class="bit__subtitulo">
+      <app-icono nombre="filtro" />
+      Filtros
+      @if (cantidadFiltros()) {
+        <span class="insignia insignia--marca">{{ cantidadFiltros() }} activos</span>
+      }
+    </h2>
+    <form class="bit__formulario" novalidate (submit)="aplicarFormulario($event)">
+      <div class="campo bit__campo">
+        <label for="bitacora-desde">Desde</label>
+        <input
+          id="bitacora-desde"
+          class="control"
+          type="date"
+          [value]="borrador().desde ?? ''"
+          (change)="escribir('desde', $event)"
+          [attr.aria-invalid]="errorDe('desde') ? 'true' : null"
+          [attr.aria-describedby]="errorDe('desde') ? 'bitacora-desde-error' : null"
+        />
+        @if (errorDe('desde'); as e) {
+          <p id="bitacora-desde-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+      <div class="campo bit__campo">
+        <label for="bitacora-hasta">Hasta</label>
+        <input
+          id="bitacora-hasta"
+          class="control"
+          type="date"
+          [value]="borrador().hasta ?? ''"
+          (change)="escribir('hasta', $event)"
+          [attr.aria-invalid]="errorDe('hasta') ? 'true' : null"
+          [attr.aria-describedby]="errorDe('hasta') ? 'bitacora-hasta-error' : null"
+        />
+        @if (errorDe('hasta'); as e) {
+          <p id="bitacora-hasta-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+      <div class="campo bit__campo">
+        <label for="bitacora-accion">Acción</label>
+        <select id="bitacora-accion" class="control" (change)="elegirAccion($event)">
+          <option value="" [selected]="!borrador().accion">Todas las acciones</option>
+          @for (a of opcionesAccion(); track a.codigo) {
+            <option [value]="a.codigo" [selected]="borrador().accion === a.codigo">
+              {{ a.etiqueta }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="campo bit__campo">
+        <label for="bitacora-resultado">Resultado</label>
+        <select id="bitacora-resultado" class="control" (change)="elegirResultado($event)">
+          <option value="" [selected]="!borrador().resultado">Todos los resultados</option>
+          @for (r of resultados; track r.id) {
+            <option [value]="r.id" [selected]="borrador().resultado === r.id">
+              {{ r.etiqueta }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="campo bit__campo bit__campo--ancho">
+        <label for="bitacora-usuario">Correo del usuario</label>
+        <input
+          id="bitacora-usuario"
+          class="control"
+          type="email"
+          inputmode="email"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="nombre@dominio.pe"
+          [value]="borrador().usuario ?? ''"
+          (input)="escribir('usuario', $event)"
+          [attr.aria-invalid]="errorDe('usuario') ? 'true' : null"
+          [attr.aria-describedby]="
+            errorDe('usuario')
+              ? 'bitacora-usuario-ayuda bitacora-usuario-error'
+              : 'bitacora-usuario-ayuda'
+          "
+        />
+        <p id="bitacora-usuario-ayuda" class="ayuda">Correo exacto. No se guarda en el enlace.</p>
+        @if (errorDe('usuario'); as e) {
+          <p id="bitacora-usuario-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+      <div class="acciones bit__acciones">
+        <button type="submit" class="btn btn--primario">
+          <app-icono nombre="search" />
+          Aplicar filtros
+        </button>
+        <button type="button" class="btn btn--fantasma" (click)="limpiar()">Limpiar</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="bit__cuerpo" [class.bit__cuerpo--con-detalle]="seleccionada()">
+    <!-- Registros -->
+    <section
+      class="bit__resultados"
+      aria-labelledby="bitacora-registros-titulo"
+      [attr.aria-busy]="estado() === 'cargando' || actualizando()"
+    >
+      <div class="bit__cabecera">
+        <h2 #tituloRegistros id="bitacora-registros-titulo" class="bit__subtitulo" tabindex="-1">
+          Registros
+        </h2>
+        <p class="bit__meta">
+          @if (estado() === 'listo') {
+            <span class="tabular">{{ paginacion().total }}</span>
+            {{ paginacion().total === 1 ? 'registro' : 'registros' }} · del más reciente al más
+            antiguo
+          }
+          @if (actualizando() && estado() === 'listo') {
+            <span class="bit__actualizando">· Actualizando…</span>
+          }
+        </p>
+      </div>
+
+      @switch (estado()) {
+        @case ('cargando') {
+          <p class="solo-lectores" role="status">Cargando la bitácora…</p>
+          <div class="tabla-contenedor" aria-hidden="true">
+            <table class="tabla tabla--apilable bit__tabla">
+              <tbody>
+                @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+                  <tr>
+                    <td><app-esqueleto [lineas]="2" ancho="6rem" /></td>
+                    <td><app-esqueleto [lineas]="2" ancho="9rem" /></td>
+                    <td><app-esqueleto [lineas]="2" ancho="10rem" /></td>
+                    <td class="bit__col-opcional"><app-esqueleto ancho="5rem" /></td>
+                    <td><app-esqueleto forma="pildora" ancho="5.5rem" /></td>
+                    <td class="bit__col-opcional"><app-esqueleto ancho="7rem" /></td>
+                    <td><app-esqueleto forma="boton" ancho="5.5rem" /></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        @case ('error') {
+          <div class="tarjeta bit__vacio" role="alert">
+            <app-estado-vacio
+              ilustracion="error"
+              titulo="No pudimos cargar la bitácora"
+              [texto]="errorCarga()"
+              [nivel]="3"
+            >
+              <button acciones type="button" class="btn btn--primario" (click)="reintentar()">
+                <app-icono nombre="refresh-cw" />
+                Reintentar
+              </button>
+            </app-estado-vacio>
+          </div>
+        }
+        @case ('listo') {
+          @if (filas().length === 0) {
+            <div class="tarjeta bit__vacio">
+              <app-estado-vacio
+                ilustracion="busqueda"
+                [titulo]="
+                  cantidadFiltros() ? 'No hay registros con estos filtros' : 'Aún no hay registros'
+                "
+                [texto]="
+                  cantidadFiltros()
+                    ? 'Cambia las fechas o la acción, o quita los filtros.'
+                    : 'Las acciones de los usuarios aparecerán aquí a medida que ocurran.'
+                "
+                [nivel]="3"
+              >
+                @if (cantidadFiltros()) {
+                  <button acciones type="button" class="btn" (click)="limpiar()">
+                    Quitar filtros
+                  </button>
+                } @else if (paginacion().actual > 0) {
+                  <button acciones type="button" class="btn" (click)="irAPagina(0)">
+                    Ir a la primera página
+                  </button>
+                }
+              </app-estado-vacio>
+            </div>
+          } @else {
+            <div class="tabla-contenedor" [class.bit__atenuada]="actualizando()">
+              <table class="tabla tabla--apilable bit__tabla">
+                <caption class="solo-lectores">
+                  Registros de auditoría, página
+                  {{
+                    paginacion().actual + 1
+                  }}
+                  de
+                  {{
+                    paginacion().totalPaginas
+                  }}, del más reciente al más antiguo
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Fecha y hora</th>
+                    <th scope="col">Actor</th>
+                    <th scope="col">Acción</th>
+                    <th scope="col" class="bit__col-opcional">Entidad</th>
+                    <th scope="col">Resultado</th>
+                    <th scope="col" class="bit__col-opcional">ID de solicitud</th>
+                    <th scope="col"><span class="solo-lectores">Detalle</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (f of filas(); track f.entrada.id) {
+                    <tr
+                      class="bit__fila"
+                      [class.bit__fila--activa]="seleccionId() === f.entrada.id"
+                      (click)="clicFila(f.entrada, $event)"
+                    >
+                      <td data-etiqueta="Fecha y hora">
+                        <time class="bit__fecha" [attr.datetime]="f.entrada.ocurridoEn">
+                          <span>{{ f.fecha }}</span>
+                          <span class="bit__secundario tabular">{{ f.hora }}</span>
+                        </time>
+                      </td>
+                      <td data-etiqueta="Actor">
+                        <span class="bit__principal">
+                          @if (f.iconoActor; as icono) {
+                            <app-icono class="bit__icono-actor" [nombre]="icono" />
+                          }
+                          {{ f.actor }}
+                        </span>
+                        <span class="bit__secundario">{{ f.rol }}</span>
+                      </td>
+                      <td data-etiqueta="Acción">
+                        <span class="bit__principal">{{ f.accion }}</span>
+                        <code class="bit__codigo">{{ f.entrada.accion }}</code>
+                      </td>
+                      <td data-etiqueta="Entidad" class="bit__col-opcional">
+                        <span class="bit__principal">{{ f.entidad }}</span>
+                        @if (f.entrada.entidadId) {
+                          <code class="bit__codigo">{{ f.entidadCorta }}</code>
+                        }
+                      </td>
+                      <td data-etiqueta="Resultado">
+                        <app-resultado-auditoria [resultado]="f.entrada.resultado" />
+                        @if (f.entrada.codigo) {
+                          <code class="bit__codigo">{{ f.entrada.codigo }}</code>
+                        }
+                      </td>
+                      <td data-etiqueta="ID de solicitud" class="bit__col-opcional">
+                        @if (f.entrada.requestId; as rid) {
+                          <span class="bit__copiable">
+                            <code class="bit__codigo bit__codigo--solicitud">{{ rid }}</code>
+                            <button
+                              type="button"
+                              class="btn btn--sm btn--icono btn--fantasma"
+                              (click)="copiar(rid, 'ID de solicitud')"
+                            >
+                              <app-icono [nombre]="copiado() === rid ? 'check' : 'copy'" />
+                              <span class="solo-lectores">Copiar el ID de solicitud {{ rid }}</span>
+                            </button>
+                          </span>
+                        } @else {
+                          <span class="bit__secundario">—</span>
+                        }
+                      </td>
+                      <td class="bit__celda-detalle">
+                        <button
+                          type="button"
+                          class="btn btn--sm"
+                          [id]="'bitacora-ver-' + f.entrada.id"
+                          [attr.aria-expanded]="seleccionId() === f.entrada.id"
+                          [attr.aria-controls]="
+                            seleccionId() === f.entrada.id ? 'bitacora-detalle' : null
+                          "
+                          (click)="seleccionar(f.entrada)"
+                        >
+                          Detalle
+                          <span class="solo-lectores">
+                            del registro {{ f.entrada.id }}: {{ f.accion }}, {{ f.fecha }}
+                            {{ f.hora }}</span
+                          >
+                          <app-icono nombre="chevron-right" />
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          @if (paginacion().total > 0) {
+            <nav class="bit__paginacion" aria-label="Paginación de la bitácora">
+              <p class="bit__rango">
+                Mostrando
+                <strong class="tabular">{{ paginacion().desde }}–{{ paginacion().hasta }}</strong>
+                de <strong class="tabular">{{ paginacion().total }}</strong>
+              </p>
+              <div class="bit__paginas">
+                <button
+                  type="button"
+                  class="btn btn--sm"
+                  (click)="irAPagina(paginacion().actual - 1)"
+                  [attr.aria-disabled]="!paginacion().hayAnterior || actualizando() ? 'true' : null"
+                >
+                  <app-icono nombre="chevron-left" />
+                  Anterior
+                </button>
+                <span class="bit__pagina-actual tabular">
+                  Página {{ paginacion().actual + 1 }} de {{ paginacion().totalPaginas }}
+                </span>
+                <button
+                  type="button"
+                  class="btn btn--sm"
+                  (click)="irAPagina(paginacion().actual + 1)"
+                  [attr.aria-disabled]="
+                    !paginacion().haySiguiente || actualizando() ? 'true' : null
+                  "
+                >
+                  Siguiente
+                  <app-icono nombre="chevron-right" />
+                </button>
+              </div>
+              <div class="bit__tamano">
+                <label for="bitacora-tamano">Por página</label>
+                <select id="bitacora-tamano" class="control" (change)="cambiarTamano($event)">
+                  @for (t of tamanos; track t) {
+                    <option [value]="t" [selected]="filtro().tamano === t">{{ t }}</option>
+                  }
+                </select>
+              </div>
+            </nav>
+          }
+        }
+      }
+    </section>
+
+    @if (seleccionada(); as s) {
+      <app-detalle-registro
+        id="bitacora-detalle"
+        class="bit__detalle"
+        [entrada]="s"
+        [copiado]="copiado()"
+        (cerrar)="cerrarDetalle()"
+        (copiar)="copiar($event.valor, $event.descripcion)"
+      />
+    }
+  </div>
+</div>

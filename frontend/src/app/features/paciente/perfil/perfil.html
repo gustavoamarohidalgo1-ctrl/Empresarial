@@ -1,0 +1,233 @@
+<app-encabezado-pagina
+  titulo="Mi perfil"
+  subtitulo="Revisa tus datos, mantén al día tu contacto y protege tu cuenta."
+/>
+
+@switch (estadoCarga()) {
+  @case ('cargando') {
+    <div class="perfil" aria-busy="true">
+      <p class="solo-lectores" role="status">Cargando tu perfil…</p>
+      <div class="tarjeta" aria-hidden="true">
+        <div class="identidad">
+          <app-esqueleto forma="circulo" alto="4rem" />
+          <div class="esqueleto-pila">
+            <app-esqueleto forma="titulo" ancho="50%" />
+            <app-esqueleto ancho="65%" />
+          </div>
+        </div>
+        <div class="seccion esqueleto-pila">
+          <app-esqueleto ancho="35%" />
+          <app-esqueleto forma="bloque" alto="3.5rem" />
+        </div>
+        <div class="seccion esqueleto-pila">
+          <app-esqueleto ancho="35%" />
+          <app-esqueleto forma="bloque" alto="7.5rem" />
+        </div>
+      </div>
+      <!-- = tarjeta «Seguridad» (enlace a Seguridad de la cuenta) -->
+      <div class="tarjeta seguridad-enlace" aria-hidden="true">
+        <app-esqueleto forma="bloque" ancho="2.5rem" alto="2.5rem" />
+        <div class="esqueleto-pila">
+          <app-esqueleto forma="titulo" ancho="30%" />
+          <app-esqueleto ancho="70%" />
+        </div>
+        <app-esqueleto forma="boton" ancho="12rem" />
+      </div>
+    </div>
+  }
+  @case ('error') {
+    <div class="tarjeta perfil" role="alert">
+      <app-estado-vacio
+        ilustracion="error"
+        titulo="No pudimos cargar tu perfil"
+        [texto]="errorCarga()"
+      >
+        <button acciones type="button" class="btn" (click)="cargar()">
+          <app-icono nombre="refresh-cw" /> Reintentar
+        </button>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('listo') {
+    @if (perfil(); as p) {
+      <div class="perfil">
+        <div aria-live="polite" aria-atomic="true">
+          @if (resultado(); as r) {
+            <div #avisoResultado class="foco-resultado" tabindex="-1">
+              <app-aviso
+                [tipo]="r.tipo"
+                [titulo]="r.tipo === 'exito' ? 'Cambios guardados' : 'No se guardaron los cambios'"
+              >
+                <p>{{ r.texto }}</p>
+              </app-aviso>
+            </div>
+          }
+        </div>
+
+        @if (desactualizado()) {
+          <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+            <p>No pudimos actualizar tu perfil. Revisa tu conexión e inténtalo de nuevo.</p>
+            <div class="acciones">
+              <button type="button" class="btn btn--sm" (click)="cargar()">
+                <app-icono nombre="refresh-cw" /> Actualizar
+              </button>
+            </div>
+          </app-aviso>
+        }
+
+        <section class="tarjeta" aria-labelledby="perfil-nombre">
+          <div class="identidad">
+            <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+            <div class="identidad__texto">
+              <h2 id="perfil-nombre" class="identidad__nombre">
+                {{ p.nombres }} {{ p.apellidos }}
+              </h2>
+              <p class="identidad__correo">{{ p.email }}</p>
+            </div>
+            <span class="insignia insignia--marca"
+              ><app-icono nombre="heart-pulse" /> Paciente</span
+            >
+          </div>
+
+          <div class="seccion">
+            <h3 class="seccion__titulo">Datos personales</h3>
+            <dl class="lista-datos lista-datos--rejilla">
+              <div>
+                <dt>Nombres</dt>
+                <dd>{{ p.nombres }}</dd>
+              </div>
+              <div>
+                <dt>Apellidos</dt>
+                <dd>{{ p.apellidos }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="seccion">
+            <div class="seccion__cabecera">
+              <h3 id="titulo-contacto" class="seccion__titulo">Datos de contacto</h3>
+              @if (!editando()) {
+                <button #botonEditar type="button" class="btn btn--sm" (click)="editar()">
+                  Editar<span class="solo-lectores"> datos de contacto</span>
+                </button>
+              }
+            </div>
+
+            @if (!editando()) {
+              <dl class="contacto">
+                <div class="contacto__fila">
+                  <dt><app-icono nombre="mail" /> Correo</dt>
+                  <dd>{{ p.email }}</dd>
+                </div>
+                <div class="contacto__fila">
+                  <dt><app-icono nombre="phone" /> Teléfono</dt>
+                  <dd class="tabular">{{ p.telefono }}</dd>
+                </div>
+              </dl>
+            } @else {
+              <form
+                class="edicion"
+                [formGroup]="formulario"
+                (ngSubmit)="guardar()"
+                novalidate
+                aria-labelledby="titulo-contacto"
+                [attr.aria-busy]="guardando()"
+              >
+                <div class="campo">
+                  <label for="perfil-email">Correo</label>
+                  <input
+                    #campoEmail
+                    id="perfil-email"
+                    class="control"
+                    type="email"
+                    formControlName="email"
+                    autocomplete="email"
+                    spellcheck="false"
+                    (input)="limpiarErrorServidor('email')"
+                    [attr.aria-invalid]="!!errorDe('email')"
+                    [attr.aria-describedby]="describir('email')"
+                  />
+                  <p id="perfil-email-ayuda" class="ayuda">Por ejemplo: nombre@dominio.pe.</p>
+                  @if (errorDe('email'); as e) {
+                    <p id="perfil-email-error" class="error-campo">{{ e }}</p>
+                  }
+                </div>
+
+                <div class="campo">
+                  <label for="perfil-telefono">Teléfono</label>
+                  <input
+                    #campoTelefono
+                    id="perfil-telefono"
+                    class="control"
+                    type="tel"
+                    formControlName="telefono"
+                    autocomplete="tel"
+                    (input)="limpiarErrorServidor('telefono')"
+                    [attr.aria-invalid]="!!errorDe('telefono')"
+                    [attr.aria-describedby]="describir('telefono')"
+                  />
+                  <p id="perfil-telefono-ayuda" class="ayuda">Por ejemplo: +51 900 000 001.</p>
+                  @if (errorDe('telefono'); as e) {
+                    <p id="perfil-telefono-error" class="error-campo">{{ e }}</p>
+                  }
+                </div>
+
+                <div class="acciones">
+                  <button
+                    type="submit"
+                    class="btn btn--primario"
+                    [class.btn--cargando]="guardando()"
+                    [disabled]="guardando() || !hayCambios()"
+                    [attr.aria-describedby]="
+                      guardando() || !hayCambios() ? 'perfil-explicacion' : null
+                    "
+                  >
+                    <app-icono nombre="check" /> Guardar cambios
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn--fantasma"
+                    (click)="descartar()"
+                    [disabled]="guardando()"
+                    [attr.aria-describedby]="guardando() ? 'perfil-explicacion' : null"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+                @if (guardando()) {
+                  <p id="perfil-explicacion" class="explicacion-deshabilitado" role="status">
+                    Guardando tus datos. Espera un momento.
+                  </p>
+                } @else if (!hayCambios()) {
+                  <p id="perfil-explicacion" class="explicacion-deshabilitado">
+                    No hay cambios por guardar: edita tu correo o tu teléfono.
+                  </p>
+                }
+              </form>
+            }
+          </div>
+
+          <p class="privacidad">
+            <app-icono nombre="shield-check" />
+            <span>Solo puedes cambiar tu correo y tu teléfono. Cada cambio queda registrado.</span>
+          </p>
+        </section>
+
+        <section class="tarjeta seguridad-enlace" aria-labelledby="perfil-seguridad-titulo">
+          <span class="seguridad-enlace__icono" aria-hidden="true"
+            ><app-icono nombre="lock"
+          /></span>
+          <div class="seguridad-enlace__textos">
+            <h2 id="perfil-seguridad-titulo" class="seguridad-enlace__titulo">Seguridad</h2>
+            <p class="seguridad-enlace__texto">
+              Cambia tu contraseña y revisa cómo protegemos tu cuenta.
+            </p>
+          </div>
+          <a class="btn btn--sm" routerLink="/cuenta/seguridad">
+            <app-icono nombre="key-round" /> Seguridad de la cuenta
+          </a>
+        </section>
+      </div>
+    }
+  }
+}

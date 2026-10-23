@@ -1,0 +1,242 @@
+<app-marco-auth
+  idTitulo="registro-titulo"
+  antetitulo="Pacientes"
+  titulo="Crea tu cuenta"
+  intro="Regístrate para reservar y gestionar tus citas en línea. Te tomará menos de dos minutos."
+  [panel]="panel"
+>
+  <div class="registro__avisos" aria-live="polite" aria-atomic="true">
+    @if (aviso(); as a) {
+      <div #avisoRef class="foco-resultado" tabindex="-1">
+        @if (a.tipo === 'correo-registrado') {
+          <app-aviso tipo="info" titulo="Este correo ya tiene una cuenta">
+            <p>Inicia sesión con ese correo o, si no recuerdas tu contraseña, recupérala.</p>
+            <div class="acciones">
+              <a
+                class="btn btn--sm btn--primario"
+                routerLink="/login"
+                [queryParams]="{ desde: 'registro' }"
+                (click)="recordarCorreo()"
+                ><app-icono nombre="log-in" /> Iniciar sesión</a
+              >
+              <a class="btn btn--sm" routerLink="/recuperar" (click)="recordarCorreo()"
+                ><app-icono nombre="key-round" /> Recuperar contraseña</a
+              >
+            </div>
+          </app-aviso>
+        } @else {
+          <app-aviso tipo="error" [titulo]="a.titulo">
+            <p>{{ a.texto }}</p>
+            @if (erroresGenerales().length) {
+              <ul class="registro__generales">
+                @for (e of erroresGenerales(); track e) {
+                  <li>{{ e }}</li>
+                }
+              </ul>
+            }
+          </app-aviso>
+        }
+      </div>
+    }
+  </div>
+
+  <form
+    class="registro"
+    [formGroup]="formulario"
+    (ngSubmit)="enviar()"
+    novalidate
+    [attr.aria-busy]="enviando()"
+  >
+    <p class="registro__obligatorios texto-sm texto-suave">Todos los campos son obligatorios.</p>
+
+    <fieldset class="registro__grupo">
+      <legend class="registro__leyenda">Datos personales</legend>
+
+      <div class="registro__fila">
+        <div class="campo">
+          <label for="registro-nombres">Nombres</label>
+          <input
+            #campoNombres
+            id="registro-nombres"
+            class="control"
+            type="text"
+            formControlName="nombres"
+            autocomplete="given-name"
+            autocapitalize="words"
+            enterkeyhint="next"
+            aria-required="true"
+            maxlength="80"
+            (input)="limpiarErrorServidor('nombres')"
+            [attr.aria-invalid]="!!errorDe('nombres')"
+            [attr.aria-describedby]="describir('nombres')"
+          />
+          @if (errorDe('nombres'); as e) {
+            <p id="registro-nombres-error" class="error-campo">{{ e }}</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="registro-apellidos">Apellidos</label>
+          <input
+            #campoApellidos
+            id="registro-apellidos"
+            class="control"
+            type="text"
+            formControlName="apellidos"
+            autocomplete="family-name"
+            autocapitalize="words"
+            enterkeyhint="next"
+            aria-required="true"
+            maxlength="80"
+            (input)="limpiarErrorServidor('apellidos')"
+            [attr.aria-invalid]="!!errorDe('apellidos')"
+            [attr.aria-describedby]="describir('apellidos')"
+          />
+          @if (errorDe('apellidos'); as e) {
+            <p id="registro-apellidos-error" class="error-campo">{{ e }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="registro__fila">
+        <div class="campo">
+          <label for="registro-email">Correo electrónico</label>
+          <input
+            #campoEmail
+            id="registro-email"
+            class="control"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            inputmode="email"
+            autocapitalize="none"
+            spellcheck="false"
+            enterkeyhint="next"
+            aria-required="true"
+            maxlength="160"
+            (input)="limpiarErrorServidor('email')"
+            [attr.aria-invalid]="!!errorDe('email')"
+            [attr.aria-describedby]="describir('email', 'registro-email-ayuda')"
+          />
+          <p id="registro-email-ayuda" class="ayuda">Con él iniciarás sesión.</p>
+          @if (errorDe('email'); as e) {
+            <p id="registro-email-error" class="error-campo">{{ e }}</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="registro-telefono">Teléfono celular</label>
+          <input
+            #campoTelefono
+            id="registro-telefono"
+            class="control"
+            type="tel"
+            formControlName="telefono"
+            autocomplete="tel"
+            inputmode="tel"
+            enterkeyhint="next"
+            aria-required="true"
+            maxlength="30"
+            (input)="limpiarErrorServidor('telefono')"
+            [attr.aria-invalid]="!!errorDe('telefono')"
+            [attr.aria-describedby]="describir('telefono', 'registro-telefono-ayuda')"
+          />
+          <p id="registro-telefono-ayuda" class="ayuda">Por ejemplo: +51 987 654 321.</p>
+          @if (errorDe('telefono'); as e) {
+            <p id="registro-telefono-error" class="error-campo">{{ e }}</p>
+          }
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="registro__grupo">
+      <legend class="registro__leyenda">Contraseña</legend>
+
+      <div class="campo">
+        <label for="registro-password">Crea una contraseña</label>
+        <app-campo-clave
+          #campoClave
+          idCampo="registro-password"
+          nombre="contraseña"
+          formControlName="password"
+          autocompletar="new-password"
+          (input)="limpiarErrorServidor('password')"
+          [invalido]="!!errorDe('password')"
+          [describedby]="describir('password', 'registro-clave-requisitos')"
+        />
+        @if (errorDe('password'); as e) {
+          <p id="registro-password-error" class="error-campo">{{ e }}</p>
+        }
+        <app-medidor-clave idBase="registro-clave" [clave]="clave()" [correo]="correo()" />
+      </div>
+
+      <div class="campo">
+        <label for="registro-confirmacion">Confirma tu contraseña</label>
+        <app-campo-clave
+          #campoConfirmacion
+          idCampo="registro-confirmacion"
+          nombre="confirmación de contraseña"
+          formControlName="confirmacion"
+          autocompletar="new-password"
+          teclaEnter="done"
+          [invalido]="!!errorDe('confirmacion')"
+          [describedby]="describir('confirmacion')"
+        />
+        @if (errorDe('confirmacion'); as e) {
+          <p id="registro-confirmacion-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+    </fieldset>
+
+    <div class="campo registro__consentimiento">
+      <label class="casilla" for="registro-privacidad">
+        <input
+          #campoPrivacidad
+          id="registro-privacidad"
+          type="checkbox"
+          formControlName="aceptaPrivacidad"
+          aria-required="true"
+          (change)="limpiarErrorServidor('aceptaPrivacidad')"
+          [attr.aria-invalid]="!!errorDe('aceptaPrivacidad')"
+          [attr.aria-describedby]="describir('aceptaPrivacidad', 'registro-privacidad-ayuda')"
+        />
+        <span>
+          He leído y acepto la
+          <a routerLink="/privacidad" target="_blank" rel="noopener"
+            >Política de privacidad<span class="solo-lectores">
+              (se abre en una pestaña nueva)</span
+            ></a
+          >
+          (versión {{ versionPrivacidad }}), y autorizo el tratamiento de mis datos personales,
+          incluidos los datos de salud de mis citas, para gestionar mi atención.
+        </span>
+      </label>
+      <p id="registro-privacidad-ayuda" class="ayuda">
+        Conforme a la Ley N.º 29733. Puedes retirar tu consentimiento cuando quieras.
+      </p>
+      @if (errorDe('aceptaPrivacidad'); as e) {
+        <p id="registro-aceptaPrivacidad-error" class="error-campo">{{ e }}</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn--primario btn--bloque btn--lg registro__enviar"
+      [class.btn--cargando]="enviando()"
+      [disabled]="enviando()"
+      [attr.aria-describedby]="enviando() ? 'registro-enviando' : null"
+    >
+      @if (!enviando()) {
+        <app-icono nombre="user-plus" />
+      }
+      {{ enviando() ? 'Creando tu cuenta…' : 'Crear cuenta' }}
+    </button>
+    @if (enviando()) {
+      <p id="registro-enviando" class="explicacion-deshabilitado registro__estado" role="status">
+        Estamos creando tu cuenta. Espera un momento.
+      </p>
+    }
+  </form>
+
+  <p class="registro__pie">¿Ya tienes una cuenta? <a routerLink="/login">Inicia sesión</a></p>
+</app-marco-auth>

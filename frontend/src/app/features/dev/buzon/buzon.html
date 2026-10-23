@@ -1,0 +1,152 @@
+<app-encabezado-pagina
+  titulo="Buzón de correo simulado"
+  subtitulo="Correos que SIGA-SP habría enviado. Fechas y horas en hora de Lima."
+>
+  <span junto-al-titulo class="insignia insignia--acento">
+    <app-icono nombre="info" /> Solo entorno de pruebas
+  </span>
+  @if (carga().estado === 'listo') {
+    <button
+      acciones
+      type="button"
+      class="btn"
+      [class.btn--cargando]="actualizando()"
+      [disabled]="actualizando()"
+      (click)="cargar(true)"
+    >
+      <app-icono nombre="refresh-cw" /> Actualizar
+    </button>
+  }
+</app-encabezado-pagina>
+
+<app-aviso tipo="info" titulo="Este es un buzón de pruebas">
+  <p>
+    En el entorno de desarrollo no se envía ningún correo real: los mensajes quedan aquí para
+    completar flujos como la recuperación de contraseña. Se muestran los 50 más recientes.
+  </p>
+</app-aviso>
+
+<div class="buzon" [attr.aria-busy]="carga().estado === 'cargando' || actualizando()">
+  @switch (carga().estado) {
+    @case ('cargando') {
+      <p class="solo-lectores" role="status">Cargando los correos…</p>
+      <ul class="buzon__lista" aria-hidden="true">
+        @for (i of esqueletos; track i) {
+          <li class="tarjeta buzon__correo">
+            <app-esqueleto forma="titulo" ancho="55%" />
+            <app-esqueleto ancho="40%" />
+            <app-esqueleto [lineas]="3" />
+            <app-esqueleto forma="boton" ancho="9rem" />
+          </li>
+        }
+      </ul>
+    }
+    @case ('no-disponible') {
+      <div class="tarjeta">
+        <app-estado-vacio
+          ilustracion="busqueda"
+          titulo="No disponible"
+          texto="El buzón de correo simulado solo existe en el entorno de desarrollo."
+        >
+          <a acciones class="btn btn--primario" routerLink="/">
+            <app-icono nombre="house" /> Ir al inicio
+          </a>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('error') {
+      <div class="tarjeta" role="alert">
+        <app-estado-vacio
+          ilustracion="error"
+          titulo="No pudimos cargar el buzón"
+          [texto]="mensajeError()"
+        >
+          <button acciones type="button" class="btn" (click)="cargar()">
+            <app-icono nombre="refresh-cw" /> Reintentar
+          </button>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('listo') {
+      @if (correos(); as correos) {
+        <p
+          #estadoRef
+          class="buzon__estado texto-sm texto-suave foco-resultado"
+          tabindex="-1"
+          role="status"
+        >
+          @if (correos.length === 1) {
+            1 correo en el buzón.
+          } @else {
+            {{ correos.length }} correos en el buzón.
+          }
+        </p>
+        @if (correos.length === 0) {
+          <div class="tarjeta">
+            <app-estado-vacio
+              ilustracion="busqueda"
+              titulo="Aún no hay correos"
+              texto="Cuando alguien solicite recuperar su contraseña, el mensaje aparecerá aquí."
+            >
+              <a acciones class="btn" routerLink="/recuperar">
+                <app-icono nombre="key-round" /> Solicitar recuperación
+              </a>
+            </app-estado-vacio>
+          </div>
+        } @else {
+          <ul class="buzon__lista">
+            @for (correo of correos; track correo.id) {
+              <li>
+                <article
+                  class="tarjeta buzon__correo"
+                  [attr.aria-labelledby]="'correo-' + correo.id"
+                >
+                  <header class="buzon__cabecera">
+                    <span class="buzon__icono" aria-hidden="true"><app-icono nombre="mail" /></span>
+                    <div class="buzon__titulos">
+                      <h2 class="buzon__asunto" [id]="'correo-' + correo.id">
+                        {{ correo.asunto }}
+                      </h2>
+                      <dl class="buzon__meta">
+                        <div>
+                          <dt>Para</dt>
+                          <dd>{{ correo.destinatario }}</dd>
+                        </div>
+                        <div>
+                          <dt>Enviado</dt>
+                          <dd>
+                            <time [attr.datetime]="correo.enviadoEn">{{
+                              correo.enviadoEn | fechaLima
+                            }}</time>
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </header>
+                  @if (correo.cuerpo) {
+                    <p class="buzon__cuerpo">{{ correo.cuerpo }}</p>
+                  } @else {
+                    <p class="buzon__cuerpo">
+                      No se guardó el contenido de este correo: se envió sin el buzón de desarrollo
+                      activo.
+                    </p>
+                  }
+                  @if (ruta(correo); as destino) {
+                    <div class="tarjeta__pie">
+                      <a class="btn btn--primario btn--sm" [routerLink]="destino">
+                        Abrir enlace<span class="solo-lectores">
+                          del correo «{{ correo.asunto }}»</span
+                        >
+                        <app-icono nombre="arrow-right" />
+                      </a>
+                    </div>
+                  }
+                </article>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  }
+</div>

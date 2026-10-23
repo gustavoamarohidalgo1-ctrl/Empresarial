@@ -1,0 +1,115 @@
+<app-marco-auth
+  idTitulo="recuperar-titulo"
+  [antetitulo]="enviadoA() ? null : 'Recupera tu acceso'"
+  [titulo]="enviadoA() ? 'Revisa tu correo' : '¿Olvidaste tu contraseña?'"
+  [intro]="
+    enviadoA()
+      ? null
+      : 'Escribe el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.'
+  "
+>
+  @if (enviadoA(); as correo) {
+    <div class="recuperar__enviado">
+      <span class="recuperar__sello" aria-hidden="true"
+        ><app-icono nombre="mail" [tamano]="28"
+      /></span>
+      <p class="recuperar__mensaje">{{ mensajeEnviada }}</p>
+      <p class="recuperar__destino texto-sm">
+        Correo indicado: <strong class="recuperar__correo">{{ correo }}</strong>
+      </p>
+      <ul class="recuperar__consejos">
+        <li>
+          <app-icono nombre="clock" />
+          <span>El enlace vence en <strong>30 minutos</strong> y solo puede usarse una vez.</span>
+        </li>
+        <li>
+          <app-icono nombre="search" />
+          <span>¿No lo ves? Revisa la carpeta de spam o de promociones.</span>
+        </li>
+        <li>
+          <app-icono nombre="refresh-cw" />
+          <span>Si no llega en unos minutos, vuelve a solicitarlo.</span>
+        </li>
+      </ul>
+
+      <div class="acciones">
+        <a class="btn btn--primario" routerLink="/login">
+          <app-icono nombre="arrow-left" /> Volver a iniciar sesión
+        </a>
+        <button type="button" class="btn btn--fantasma" (click)="otroCorreo()">
+          Usar otro correo
+        </button>
+      </div>
+
+      @if (esDesarrollo()) {
+        <p class="recuperar__dev">
+          <app-icono nombre="info" />
+          <span
+            >Entorno de desarrollo:
+            <a routerLink="/dev/buzon">Abrir buzón de correo simulado</a></span
+          >
+        </p>
+      }
+    </div>
+  } @else {
+    <div class="recuperar__avisos" aria-live="polite" aria-atomic="true">
+      @if (errorGeneral(); as e) {
+        <div #avisoRef class="foco-resultado" tabindex="-1">
+          <app-aviso tipo="error" [titulo]="e.titulo"
+            ><p>{{ e.texto }}</p></app-aviso
+          >
+        </div>
+      }
+    </div>
+
+    <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate [attr.aria-busy]="enviando()">
+      <div class="campo">
+        <label for="recuperar-email">Correo electrónico</label>
+        <input
+          #campoEmail
+          id="recuperar-email"
+          class="control"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          inputmode="email"
+          autocapitalize="none"
+          spellcheck="false"
+          enterkeyhint="send"
+          aria-required="true"
+          maxlength="160"
+          placeholder="nombre@dominio.pe"
+          (input)="errorServidor.set(null)"
+          [attr.aria-invalid]="!!errorEmail()"
+          [attr.aria-describedby]="errorEmail() ? 'recuperar-email-error' : null"
+        />
+        @if (errorEmail(); as e) {
+          <p id="recuperar-email-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn--primario btn--bloque btn--lg"
+        [class.btn--cargando]="enviando()"
+        [disabled]="enviando()"
+        [attr.aria-describedby]="enviando() ? 'recuperar-enviando' : null"
+      >
+        <app-icono nombre="mail" /> Enviar enlace
+      </button>
+      @if (enviando()) {
+        <p
+          id="recuperar-enviando"
+          class="explicacion-deshabilitado recuperar__estado"
+          role="status"
+        >
+          Enviando la solicitud. Espera un momento.
+        </p>
+      }
+    </form>
+
+    <p class="recuperar__pie">
+      <a routerLink="/login"><app-icono nombre="arrow-left" /> Volver a iniciar sesión</a>
+    </p>
+  }
+</app-marco-auth>

@@ -1,0 +1,190 @@
+/* Tarjeta de datos centrada: identidad con avatar, datos personales y contacto editable en línea. */
+.perfil {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.identidad {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3) var(--e-4);
+  padding-bottom: var(--e-5);
+  border-bottom: 1px solid var(--c-borde);
+}
+
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--c-primario-suave);
+  box-shadow: 0 0 0 4px var(--c-primario-tenue);
+  color: var(--c-primario-fuerte);
+  font-size: var(--t-24);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.identidad__texto {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.tarjeta .identidad__nombre {
+  margin: 0 0 var(--e-1);
+  font-size: var(--t-24);
+}
+
+.identidad__correo {
+  margin: 0;
+  color: var(--c-texto-2);
+  overflow-wrap: anywhere;
+}
+
+.insignia {
+  --icono-tamano: 0.875rem;
+}
+
+.seccion {
+  margin-top: var(--e-6);
+}
+
+.seccion__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-3);
+  margin-bottom: var(--e-3);
+}
+
+.tarjeta .seccion__titulo {
+  margin: 0 0 var(--e-3);
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tarjeta .seccion__cabecera .seccion__titulo {
+  margin: 0;
+}
+
+.contacto {
+  margin: 0;
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-control);
+}
+
+.contacto__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-1) var(--e-4);
+  min-height: 3.5rem;
+  padding: var(--e-3) var(--e-4);
+}
+
+.contacto__fila + .contacto__fila {
+  border-top: 1px solid var(--c-borde);
+}
+
+.contacto dt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+  font-weight: 500;
+  --icono-tamano: 1rem;
+}
+
+.contacto dd {
+  min-width: 0;
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.edicion {
+  padding: var(--e-4);
+  border: 1px solid var(--c-primario-borde);
+  border-radius: var(--r-control);
+  background: var(--c-primario-tenue);
+}
+
+.edicion .campo {
+  margin-bottom: var(--e-4);
+}
+
+.edicion .acciones {
+  margin-top: var(--e-2);
+}
+
+.privacidad {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  margin: var(--e-6) 0 0;
+  padding-top: var(--e-4);
+  border-top: 1px solid var(--c-borde);
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+  --icono-tamano: 1rem;
+}
+
+.privacidad app-icono {
+  margin-top: 0.2em;
+  color: var(--c-acento);
+}
+
+.esqueleto-pila {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--e-2);
+  min-width: 0;
+}
+
+/* ----- Seguridad: enlace a «Seguridad de la cuenta» ----- */
+
+.seguridad-enlace {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3) var(--e-4);
+  margin-top: var(--e-6);
+}
+
+.seguridad-enlace__icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-control);
+  background: var(--c-acento-suave);
+  color: var(--c-acento);
+}
+
+.seguridad-enlace__textos {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.tarjeta .seguridad-enlace__titulo {
+  margin: 0 0 var(--e-1);
+  font-size: var(--t-20);
+}
+
+.seguridad-enlace__texto {
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+}

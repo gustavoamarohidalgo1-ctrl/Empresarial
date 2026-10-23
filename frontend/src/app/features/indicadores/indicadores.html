@@ -1,0 +1,157 @@
+<app-encabezado-pagina
+  titulo="Indicadores"
+  subtitulo="Confirmación, cancelación, reprogramación, inasistencia y tiempos de espera de la atención ambulatoria."
+>
+  <button
+    acciones
+    type="button"
+    class="btn"
+    [class.btn--girando]="actualizando()"
+    (click)="actualizar()"
+    [attr.aria-disabled]="actualizando() ? 'true' : null"
+  >
+    <app-icono nombre="refresh-cw" />
+    Actualizar
+  </button>
+  <a acciones class="btn btn--primario" [href]="urlCsv()" [attr.download]="nombreCsv()">
+    <app-icono nombre="download" />
+    Exportar CSV
+  </a>
+</app-encabezado-pagina>
+
+<p class="solo-lectores" role="status">{{ anuncio() }}</p>
+
+<div class="pila pila--lg">
+  @if (avisoEnlace(); as aviso) {
+    <app-aviso tipo="advertencia" titulo="Enlace con filtros no válidos">
+      <p>{{ aviso }}</p>
+    </app-aviso>
+  }
+
+  <app-filtros-indicadores
+    [filtro]="filtro()"
+    [hoy]="hoy"
+    [sedes]="sedes()"
+    [especialidades]="especialidades()"
+    [profesionales]="profesionales()"
+    [errorCatalogos]="errorCatalogos()"
+    (cambiar)="aplicarFiltro($event)"
+    (reintentarCatalogos)="cargarCatalogos()"
+  />
+
+  <section
+    class="ind"
+    aria-labelledby="ind-resultados-titulo"
+    [attr.aria-busy]="estado() === 'cargando' || actualizando()"
+  >
+    <div class="ind__contexto">
+      <h2 #tituloResultados id="ind-resultados-titulo" class="ind__titulo" tabindex="-1">
+        <span class="ind__rango">{{ contexto().rango }}</span>
+        <span class="insignia insignia--marca">{{ contexto().preset }}</span>
+      </h2>
+      <p class="ind__meta">
+        @if (contexto().total; as total) {
+          <span class="ind__dato"><app-icono nombre="calendar" /> {{ total }}</span>
+        }
+        @if (contexto().corte; as c) {
+          <span class="ind__dato">
+            <app-icono nombre="clock" />
+            Datos al <time [attr.datetime]="c.iso">{{ c.texto }}</time> · hora de Lima
+          </span>
+        }
+        @if (actualizando() && estado() === 'listo') {
+          <span class="ind__dato ind__dato--estado">Actualizando…</span>
+        } @else if (desactualizado()) {
+          <span class="ind__dato ind__dato--alerta">
+            <app-icono nombre="alert-triangle" /> No pudimos actualizar: datos anteriores
+          </span>
+        }
+      </p>
+    </div>
+
+    @switch (estado()) {
+      @case ('cargando') {
+        <p class="solo-lectores" role="status">Cargando los indicadores…</p>
+        <ul class="ind__tarjetas" aria-hidden="true">
+          @for (t of tarjetas(); track t.id) {
+            <li><app-tarjeta-indicador [datos]="t" cargando /></li>
+          }
+        </ul>
+        <div class="ind__graficos" aria-hidden="true">
+          <div class="tarjeta ind__esqueleto-grafico">
+            <app-esqueleto forma="titulo" ancho="11rem" />
+            <app-esqueleto ancho="55%" />
+            <app-esqueleto forma="bloque" alto="18.5rem" />
+          </div>
+          <div class="ind__fila">
+            <div class="tarjeta ind__esqueleto-grafico">
+              <app-esqueleto forma="titulo" ancho="10rem" />
+              <app-esqueleto ancho="70%" />
+              <app-esqueleto forma="circulo" alto="13.5rem" />
+            </div>
+            <div class="tarjeta ind__esqueleto-grafico">
+              <app-esqueleto forma="titulo" ancho="14rem" />
+              <app-esqueleto ancho="70%" />
+              <app-esqueleto [lineas]="6" />
+            </div>
+          </div>
+        </div>
+      }
+      @case ('error') {
+        <div class="tarjeta ind__vacio" role="alert">
+          <app-estado-vacio
+            ilustracion="error"
+            titulo="No pudimos cargar los indicadores"
+            [texto]="errorCarga()"
+            [nivel]="3"
+          >
+            <button acciones type="button" class="btn btn--primario" (click)="reintentar()">
+              <app-icono nombre="refresh-cw" />
+              Reintentar
+            </button>
+          </app-estado-vacio>
+        </div>
+      }
+      @case ('listo') {
+        <div class="ind__contenido" [class.ind__contenido--actualizando]="actualizando()">
+          @if (sinCitas()) {
+            <div class="tarjeta ind__vacio">
+              <app-estado-vacio
+                ilustracion="busqueda"
+                titulo="No hay citas en este periodo"
+                texto="Elige otro periodo o quita algunos filtros para ver más resultados."
+                [nivel]="3"
+              >
+                <button acciones type="button" class="btn" (click)="salirDelVacio()">
+                  @if (hayFiltrosExtra()) {
+                    Quitar filtros
+                  } @else {
+                    Ver el mes anterior
+                  }
+                </button>
+              </app-estado-vacio>
+            </div>
+          } @else if (resumen(); as r) {
+            <ul class="ind__tarjetas" aria-label="Indicadores del periodo">
+              @for (t of tarjetas(); track t.id) {
+                <li><app-tarjeta-indicador [datos]="t" /></li>
+              }
+            </ul>
+            <div class="ind__graficos">
+              <app-grafico-dias [porDia]="r.porDia" />
+              <div class="ind__fila">
+                <app-grafico-estados [porEstado]="r.porEstado" [totalCitas]="r.totalCitas" />
+                <app-grafico-especialidades [porEspecialidad]="r.porEspecialidad" />
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </section>
+
+  <app-metodologia
+    [corteIso]="resumen()?.corte ?? null"
+    [zonaHoraria]="resumen()?.zonaHoraria ?? 'America/Lima'"
+  />
+</div>

@@ -1,0 +1,80 @@
+<section class="hero" aria-labelledby="landing-titulo">
+  <div class="contenedor hero__rejilla">
+    <div class="hero__texto">
+      <p class="hero__etiqueta">
+        <app-icono nombre="heart-pulse" /> Citas de atención ambulatoria en línea
+      </p>
+      <h1 id="landing-titulo" class="hero__titulo">
+        Reserva y gestiona tus citas médicas
+        <span class="hero__resalte">sin filas ni llamadas</span>
+      </h1>
+      <p class="hero__lead">
+        Con SIGA-SP eliges especialidad, profesional y horario en minutos, recibes recordatorios y
+        confirmas, reprogramas o cancelas desde tu celular. Siempre en hora de Lima.
+      </p>
+      <div class="acciones hero__acciones">
+        <a class="btn btn--primario btn--lg" routerLink="/registro">
+          <app-icono nombre="user-plus" /> Crear cuenta
+        </a>
+        <a class="btn btn--lg" routerLink="/login">
+          <app-icono nombre="log-in" /> Iniciar sesión
+        </a>
+      </div>
+      <ul class="hero__sellos" aria-label="Ventajas">
+        @for (sello of sellos; track sello) {
+          <li><app-icono nombre="check-circle" /> {{ sello }}</li>
+        }
+      </ul>
+    </div>
+    <app-ilustracion-hero class="hero__ilustracion" />
+  </div>
+</section>
+
+<section class="banda" aria-labelledby="landing-beneficios">
+  <div class="contenedor">
+    <header class="cabecera-seccion">
+      <p class="cabecera-seccion__antetitulo">Para pacientes</p>
+      <h2 id="landing-beneficios" class="cabecera-seccion__titulo">
+        Todo lo que necesitas para tu atención ambulatoria
+      </h2>
+      <p class="cabecera-seccion__texto">
+        Una sola cuenta para reservar, recibir avisos y llegar a la sede con todo listo.
+      </p>
+    </header>
+    <ul class="beneficios">
+      @for (b of beneficios; track b.titulo) {
+        <li class="beneficio">
+          <span class="beneficio__icono"><app-icono [nombre]="b.icono" /></span>
+          <h3 class="beneficio__titulo">{{ b.titulo }}</h3>
+          <p class="beneficio__texto">{{ b.texto }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="banda banda--suave" aria-labelledby="landing-como-funciona">
+  <div class="contenedor">
+    <header class="cabecera-seccion">
+      <p class="cabecera-seccion__antetitulo">Cómo funciona</p>
+      <h2 id="landing-como-funciona" class="cabecera-seccion__titulo">Tu cita en tres pasos</h2>
+      <p class="cabecera-seccion__texto">
+        Del celular a la consulta, sin llamadas ni colas en ventanilla.
+      </p>
+    </header>
+    <ol class="pasos">
+      @for (p of pasos; track p.titulo; let i = $index) {
+        <li class="paso">
+          <span class="paso__numero" aria-hidden="true">{{ i + 1 }}</span>
+          <span class="paso__icono"><app-icono [nombre]="p.icono" /></span>
+          <h3 class="paso__titulo">
+            <span class="solo-lectores">Paso {{ i + 1 }}: </span>{{ p.titulo }}
+          </h3>
+          <p class="paso__texto">{{ p.texto }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<app-landing-secciones [confianza]="confianza" [equipo]="equipo" [preguntas]="preguntas" />

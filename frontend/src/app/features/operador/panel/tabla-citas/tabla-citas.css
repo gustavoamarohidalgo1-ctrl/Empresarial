@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.cita__nombre,
+.cita__pro {
+  color: var(--c-texto);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cita__codigo,
+.cita__especialidad {
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  font-weight: 500;
+}
+
+.cita__paciente {
+  font-weight: 400;
+}
+
+.cita__llegada {
+  white-space: nowrap;
+}
+
+.cita--cerrada .cita__hora {
+  color: var(--c-texto-2);
+}
+
+.cita__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2);
+}
+
+.cita__sin-acciones {
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+}
+
+/* Escritorio: tabla (la tarjeta que la envuelve es del panel). */
+@media (min-width: 60rem) {
+  .contenedor-citas {
+    overflow-x: auto;
+    border-top: 1px solid var(--c-borde);
+  }
+
+  .citas th:first-child,
+  .citas td:first-child {
+    padding-left: var(--e-6);
+  }
+
+  .citas th:last-child,
+  .citas td:last-child {
+    padding-right: var(--e-6);
+  }
+
+  .cita__hora {
+    width: 5.5rem;
+    font-size: var(--t-16);
+    font-weight: 650;
+  }
+
+  .cita__nombre,
+  .cita__codigo,
+  .cita__pro,
+  .cita__especialidad {
+    display: block;
+  }
+
+  .cita__estado {
+    width: 9.5rem;
+  }
+
+  .citas__col-acciones,
+  .cita__acciones {
+    text-align: right;
+  }
+
+  .cita__botones {
+    justify-content: flex-end;
+  }
+
+  .cita__icono-movil,
+  .cita__etiqueta-movil {
+    display: none;
+  }
+
+  .cita--en-curso > * {
+    background: var(--c-primario-tenue);
+  }
+
+  .cita--en-curso > :first-child {
+    box-shadow: inset 3px 0 0 var(--c-primario);
+  }
+}
+
+/* Tablet y móvil: cada cita es una tarjeta (2 columnas en tablet, 1 en móvil). */
+@media (max-width: 59.98rem) {
+  .citas thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .citas {
+    display: block;
+  }
+
+  .citas tbody {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: var(--e-3);
+  }
+
+  .cita {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'hora estado'
+      'paciente paciente'
+      'profesional profesional'
+      'llegada llegada'
+      'acciones acciones';
+    align-items: center;
+    gap: var(--e-1) var(--e-3);
+    padding: var(--e-4);
+    border: 1px solid var(--c-borde);
+    border-radius: var(--r-tarjeta);
+    background: var(--c-superficie);
+    box-shadow: var(--sombra-1);
+  }
+
+  .cita:hover {
+    background: var(--c-superficie);
+  }
+
+  .cita > * {
+    padding: 0;
+    border: 0;
+  }
+
+  .cita > .cita__hora {
+    grid-area: hora;
+    font-size: var(--t-20);
+    font-weight: 700;
+  }
+
+  .cita > .cita__estado {
+    grid-area: estado;
+  }
+
+  .cita > .cita__paciente {
+    grid-area: paciente;
+    margin-top: var(--e-1);
+  }
+
+  .cita__nombre {
+    margin-right: var(--e-1);
+    font-size: var(--t-16);
+  }
+
+  .cita > .cita__profesional,
+  .cita > .cita__llegada {
+    --icono-tamano: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--e-2);
+    color: var(--c-texto-2);
+    font-size: var(--t-14);
+  }
+
+  .cita > .cita__profesional {
+    grid-area: profesional;
+  }
+
+  .cita > .cita__llegada {
+    grid-area: llegada;
+  }
+
+  .cita__especialidad::before {
+    content: '· ';
+  }
+
+  .cita > .cita__acciones {
+    grid-area: acciones;
+    margin-top: var(--e-2);
+    padding-top: var(--e-3);
+    border-top: 1px solid var(--c-borde);
+  }
+
+  /* En tarjeta, «Sin acciones disponibles» se conserva solo para lectores: ambas vistas informan lo mismo. */
+  .cita > .cita__acciones:has(.cita__sin-acciones) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .cita__botones .btn {
+    flex: 1 1 10rem;
+    min-height: var(--alto-control);
+  }
+
+  .cita.cita--en-curso {
+    border-color: var(--c-primario-borde);
+    box-shadow:
+      inset 3px 0 0 var(--c-primario),
+      var(--sombra-1);
+  }
+}
+
+@media (forced-colors: active) {
+  .cita {
+    border-color: CanvasText;
+  }
+}

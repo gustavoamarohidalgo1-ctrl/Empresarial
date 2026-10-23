@@ -1,0 +1,366 @@
+<app-encabezado-pagina titulo="Reprogramar cita" [subtitulo]="subtitulo()" [migas]="migas()">
+  @if (cita(); as c) {
+    <app-estado-cita junto-al-titulo tamano="sm" [estado]="c.estado" [etiqueta]="c.estadoEtiqueta" />
+  }
+</app-encabezado-pagina>
+
+@switch (estadoCarga()) {
+  @case ('cargando') {
+    <div aria-busy="true">
+      <p class="solo-lectores" role="status">Cargando la cita…</p>
+      <div class="reprogramar" aria-hidden="true">
+        <div class="tarjeta pila">
+          <app-esqueleto forma="titulo" ancho="55%" />
+          <app-esqueleto ancho="80%" />
+          <div class="dias__lista esqueleto-dias">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <app-esqueleto forma="bloque" ancho="4.5rem" alto="6.5rem" />
+            }
+          </div>
+          <div class="horas__rejilla">
+            @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+              <app-esqueleto forma="bloque" alto="4rem" />
+            }
+          </div>
+        </div>
+        <div class="tarjeta pila">
+          <app-esqueleto forma="titulo" ancho="60%" />
+          <app-esqueleto forma="bloque" alto="6.5rem" />
+          <app-esqueleto ancho="40%" />
+          <app-esqueleto forma="boton" />
+          <app-esqueleto forma="boton" />
+        </div>
+      </div>
+    </div>
+  }
+  @case ('no-encontrada') {
+    <div class="tarjeta tarjeta--estado" role="alert">
+      <app-estado-vacio
+        ilustracion="busqueda"
+        titulo="No encontramos esta cita"
+        texto="Puede que no exista o que no pertenezca a tu cuenta."
+      >
+        <a acciones class="btn btn--primario" routerLink="/paciente/citas">
+          <app-icono nombre="arrow-left" /> Volver a Mis citas
+        </a>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('error') {
+    <div class="tarjeta tarjeta--estado" role="alert">
+      <app-estado-vacio
+        ilustracion="error"
+        titulo="No pudimos cargar la información"
+        [texto]="errorCarga()"
+      >
+        <button acciones type="button" class="btn" (click)="cargar()">
+          <app-icono nombre="refresh-cw" /> Reintentar
+        </button>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('listo') {
+    @if (cita(); as c) {
+      <div aria-live="polite" aria-atomic="true">
+        @if (mensaje(); as m) {
+          <div #avisoResultado class="foco-resultado" tabindex="-1">
+            <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+              <p>{{ m.texto }}</p>
+              @if (m.reintentar || m.actualizar) {
+                <div class="acciones">
+                  @if (m.reintentar) {
+                    <button
+                      type="button"
+                      class="btn btn--primario"
+                      [class.btn--cargando]="enviando()"
+                      (click)="guardar()"
+                      [disabled]="enviando()"
+                    >
+                      <app-icono nombre="refresh-cw" /> Reintentar
+                    </button>
+                  }
+                  @if (m.actualizar) {
+                    <button type="button" class="btn" (click)="actualizar()">
+                      <app-icono nombre="refresh-cw" /> Actualizar vista
+                    </button>
+                  }
+                </div>
+              }
+            </app-aviso>
+          </div>
+        }
+      </div>
+
+      @if (desactualizada()) {
+        <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+          <p>No pudimos actualizar los datos de la cita. Revisa tu conexión e inténtalo de nuevo.</p>
+          <div class="acciones">
+            <button type="button" class="btn btn--sm" (click)="actualizar()">
+              <app-icono nombre="refresh-cw" /> Actualizar
+            </button>
+          </div>
+        </app-aviso>
+      }
+
+      @if (!permitido()) {
+        <div class="tarjeta tarjeta--estado">
+          <app-estado-vacio
+            ilustracion="calendario"
+            titulo="Esta cita no se puede reprogramar"
+            [texto]="
+              'En su estado actual (' + c.estadoEtiqueta + '), la cita ya no admite reprogramación.'
+            "
+          >
+            <a acciones class="btn" [routerLink]="['/paciente/citas', c.id]">
+              <app-icono nombre="arrow-left" /> Volver al detalle
+            </a>
+          </app-estado-vacio>
+        </div>
+      } @else if (paso() === 'elegir') {
+        <div class="reprogramar">
+          <section class="tarjeta" aria-labelledby="titulo-elegir">
+            <div class="seccion__cabecera">
+              <h2 id="titulo-elegir" #tituloElegir tabindex="-1" class="seccion__titulo">
+                <span class="numero" aria-hidden="true">1</span> Elige el nuevo horario
+              </h2>
+              <button
+                type="button"
+                class="btn btn--sm btn--fantasma"
+                [class.btn--cargando]="estadoHorarios() === 'cargando'"
+                (click)="cargarHorarios()"
+                [disabled]="estadoHorarios() === 'cargando'"
+              >
+                <app-icono nombre="refresh-cw" /> Actualizar horarios
+              </button>
+            </div>
+            <p class="texto-suave texto-sm seccion__ayuda">
+              Horarios libres con {{ c.profesional.nombre }}
+              @if (sedeUnica(); as s) {
+                en {{ s }}
+              }
+              {{ rango() }}.
+            </p>
+
+            <div class="horarios" [attr.aria-busy]="estadoHorarios() === 'cargando'">
+              @switch (estadoHorarios()) {
+                @case ('cargando') {
+                  <p class="solo-lectores" role="status">Buscando horarios disponibles…</p>
+                  <div aria-hidden="true">
+                    <app-esqueleto class="esqueleto-leyenda" ancho="3rem" />
+                    <div class="dias__lista esqueleto-dias">
+                      @for (i of [1, 2, 3, 4, 5]; track i) {
+                        <app-esqueleto forma="bloque" ancho="4.5rem" alto="6.5rem" />
+                      }
+                    </div>
+                    <app-esqueleto class="esqueleto-leyenda" ancho="45%" />
+                    <div class="horas__rejilla">
+                      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+                        <app-esqueleto forma="bloque" alto="4rem" />
+                      }
+                    </div>
+                  </div>
+                }
+                @case ('error') {
+                  <app-aviso tipo="error" titulo="No pudimos cargar los horarios">
+                    <p>{{ errorHorarios() }}</p>
+                    <div class="acciones">
+                      <button type="button" class="btn" (click)="cargarHorarios()">
+                        <app-icono nombre="refresh-cw" /> Reintentar
+                      </button>
+                    </div>
+                  </app-aviso>
+                }
+                @case ('listo') {
+                  @if (diaActivo(); as dia) {
+                    <fieldset class="dias">
+                      <legend class="grupo__titulo">Día</legend>
+                      <div class="dias__lista">
+                        @for (d of dias(); track d.clave) {
+                          <label class="chip dia">
+                            <input
+                              type="radio"
+                              name="dia"
+                              [value]="d.clave"
+                              [checked]="d.clave === dia.clave"
+                              (change)="elegirDia(d.clave)"
+                            />
+                            <span class="dia__semana" aria-hidden="true">{{ d.semana }}</span>
+                            <span class="dia__numero" aria-hidden="true">{{ d.dia }}</span>
+                            <span class="dia__mes" aria-hidden="true">{{ d.mes }}</span>
+                            <span class="solo-lectores dia__titulo">{{ d.titulo }}, </span>
+                            <span class="chip__contador"
+                              >{{ d.horarios.length
+                              }}<span class="solo-lectores">
+                                {{ d.horarios.length === 1 ? 'horario libre' : 'horarios libres' }}</span
+                              ></span
+                            >
+                          </label>
+                        }
+                      </div>
+                    </fieldset>
+
+                    <fieldset class="horas">
+                      <legend class="grupo__titulo">
+                        Hora <span class="horas__dia">· {{ dia.titulo }}</span>
+                      </legend>
+                      @for (f of dia.franjas; track f.franja) {
+                        <div class="franja" role="group" [attr.aria-label]="f.franja">
+                          <p class="franja__titulo" aria-hidden="true">{{ f.franja }}</p>
+                          <div class="horas__rejilla">
+                            @for (h of f.horarios; track h.id) {
+                              <label class="hora">
+                                <input
+                                  type="radio"
+                                  name="horario"
+                                  [value]="h.id"
+                                  [checked]="horarioId() === h.id"
+                                  (change)="elegirHorario(h.id)"
+                                />
+                                <span class="hora__inicio">{{ h.inicio | fechaLima: 'hora' }}</span>
+                                <span class="hora__fin"> – {{ h.fin | fechaLima: 'hora' }}</span>
+                                @if (variasSedes()) {
+                                  <span class="hora__sede">{{ h.sede.nombre }}</span>
+                                }
+                                <app-icono class="hora__marca" nombre="check-circle" />
+                              </label>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </fieldset>
+                  } @else {
+                    <app-estado-vacio
+                      compacto
+                      [nivel]="3"
+                      ilustracion="calendario"
+                      titulo="No hay horarios disponibles"
+                      [texto]="
+                        'No encontramos horarios libres ' + rango() + '. Vuelve a consultar más tarde.'
+                      "
+                    />
+                  }
+                }
+              }
+            </div>
+          </section>
+
+          <section class="tarjeta resumen-cambio" aria-labelledby="titulo-motivo">
+            <h2 id="titulo-motivo" class="seccion__titulo">
+              <span class="numero" aria-hidden="true">2</span> Motivo y resumen
+            </h2>
+            <app-cambio-horario [actual]="c" [nuevo]="horarioElegido()" />
+
+            <div class="campo">
+              <label for="motivo-reprogramacion">Motivo de la reprogramación</label>
+              <select
+                id="motivo-reprogramacion"
+                class="control"
+                (change)="elegirMotivo($event)"
+                required
+                aria-describedby="motivo-reprogramacion-ayuda"
+              >
+                <option value="" [selected]="!motivoCodigo()">Elige un motivo</option>
+                @for (m of motivos(); track m.codigo) {
+                  <option [value]="m.codigo" [selected]="m.codigo === motivoCodigo()">
+                    {{ m.descripcion }}
+                  </option>
+                }
+              </select>
+              <p id="motivo-reprogramacion-ayuda" class="ayuda">
+                Obligatorio. Elige la opción que mejor describa tu caso.
+              </p>
+            </div>
+
+            <p class="nota">
+              <app-icono nombre="info" />
+              <span
+                >El horario se verifica al guardar. La cita conserva su código y vuelve a estado
+                Pendiente.</span
+              >
+            </p>
+
+            <button
+              type="button"
+              class="btn btn--primario btn--bloque"
+              (click)="continuar()"
+              [disabled]="!!faltante()"
+              [attr.aria-describedby]="faltante() ? 'explicacion-continuar' : null"
+            >
+              Revisar el cambio <app-icono nombre="arrow-right" />
+            </button>
+            @if (faltante()) {
+              <p id="explicacion-continuar" class="explicacion-deshabilitado">{{ faltante() }}</p>
+            }
+          </section>
+        </div>
+      } @else {
+        <section class="tarjeta revision" aria-labelledby="titulo-resumen">
+          <span class="revision__icono" aria-hidden="true"><app-icono nombre="calendar-clock" /></span>
+          <h2 id="titulo-resumen" #tituloResumen tabindex="-1" class="revision__titulo">
+            Revisa el cambio antes de guardar
+          </h2>
+          <app-cambio-horario [actual]="c" [nuevo]="horarioElegido()" />
+
+          <dl class="lista-datos revision__datos">
+            <dt>Cita</dt>
+            <dd>{{ c.codigo }}</dd>
+            <dt>Horario actual</dt>
+            <dd>{{ c.inicio | fechaLima }}</dd>
+            @if (horarioElegido(); as h) {
+              <dt>Nuevo horario</dt>
+              <dd>
+                <strong>{{ h.inicio | fechaLima }} – {{ h.fin | fechaLima: 'hora' }}</strong>
+              </dd>
+              <dt>Sede</dt>
+              <dd>{{ h.sede.nombre }}</dd>
+              <dt>Profesional</dt>
+              <dd>{{ h.profesional.nombre }}</dd>
+            }
+            <dt>Motivo</dt>
+            <dd>{{ motivoElegido()?.descripcion }}</dd>
+          </dl>
+
+          <app-aviso tipo="info" titulo="Al guardar">
+            <p>
+              La cita conserva su código y vuelve a <strong>Pendiente</strong>: tendrás que
+              confirmarla de nuevo y, si ya lo habías hecho, repetir el pre-check-in.
+            </p>
+          </app-aviso>
+
+          <div class="acciones revision__acciones">
+            <button
+              type="button"
+              class="btn btn--primario"
+              [class.btn--cargando]="enviando()"
+              (click)="guardar()"
+              [disabled]="enviando() || revalidando()"
+              [attr.aria-describedby]="
+                enviando() || revalidando() ? 'explicacion-guardando' : null
+              "
+            >
+              <app-icono nombre="check" /> Guardar cambio
+            </button>
+            <button
+              type="button"
+              class="btn"
+              (click)="volverAElegir()"
+              [disabled]="enviando()"
+              [attr.aria-describedby]="enviando() ? 'explicacion-guardando' : null"
+            >
+              <app-icono nombre="arrow-left" /> Cambiar la selección
+            </button>
+          </div>
+          @if (enviando()) {
+            <p id="explicacion-guardando" class="explicacion-deshabilitado" role="status">
+              Guardando el cambio. Espera un momento.
+            </p>
+          } @else if (revalidando()) {
+            <p id="explicacion-guardando" class="explicacion-deshabilitado">
+              Comprobando los datos más recientes de la cita…
+            </p>
+          }
+        </section>
+      }
+    }
+  }
+}

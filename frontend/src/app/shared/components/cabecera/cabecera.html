@@ -1,0 +1,92 @@
+<header class="cab">
+  <div class="contenedor cab__barra" [class.cab__barra--invitado]="!usuario()">
+    <a class="cab__marca" [routerLink]="inicio()">
+      <app-marca class="cab__marca-larga" subtitulo="Atención ambulatoria" />
+      @if (!usuario()) {
+        <app-marca class="cab__marca-corta" />
+      }
+    </a>
+
+    @if (usuario(); as u) {
+      <div #zonaNav class="cab__zona-nav">
+        <button
+          #botonNav
+          type="button"
+          class="cab__boton-nav btn btn--fantasma btn--icono"
+          aria-controls="cab-navegacion"
+          [attr.aria-expanded]="navAbierta()"
+          (click)="alternarNav()"
+        >
+          <app-icono [nombre]="navAbierta() ? 'x' : 'menu'" [tamano]="22" />
+          <span class="solo-lectores">Menú de navegación</span>
+          @if (esPaciente()) {
+            <ng-container #anclaPunto />
+          }
+        </button>
+        <nav
+          id="cab-navegacion"
+          class="cab__nav"
+          [class.cab__nav--abierta]="navAbierta()"
+          aria-label="Navegación principal"
+        >
+          <ul>
+            @for (enlace of enlaces(); track enlace.ruta) {
+              <li>
+                <a
+                  [routerLink]="enlace.ruta"
+                  routerLinkActive="activo"
+                  [routerLinkActiveOptions]="{ exact: enlace.exacto }"
+                  ariaCurrentWhenActive="page"
+                  ><app-icono [nombre]="enlace.icono" /><span>{{ enlace.texto }}</span>
+                  @if (enlace.ruta === rutaNotificaciones) {
+                    <ng-container #anclaNumero />
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+      </div>
+
+      <div #zonaUsuario class="cab__usuario" (focusout)="alSalirFocoMenu($event)">
+        <button
+          #botonMenu
+          type="button"
+          class="cab__chip"
+          aria-controls="cab-menu-usuario"
+          [attr.aria-expanded]="menuAbierto()"
+          (click)="alternarMenu()"
+        >
+          <span class="cab__avatar" aria-hidden="true">{{ iniciales() }}</span>
+          <span class="cab__persona">
+            <span class="solo-lectores">Menú de usuario: </span>
+            <span class="cab__nombre">{{ u.nombre }}</span>
+            <span class="cab__rol"
+              ><span class="solo-lectores">, rol: </span>{{ etiquetaRol() }}</span
+            >
+          </span>
+          <app-icono class="cab__chevron" nombre="chevron-down" [tamano]="16" />
+        </button>
+
+        <!-- Panel del menú (MenuUsuarioComponent), cargado en diferido. Mientras no está, este
+             nodo vacío es el destino de aria-controls. -->
+        <ng-container #anclaMenu />
+        @if (!menuListo()) {
+          <div id="cab-menu-usuario" hidden></div>
+        }
+      </div>
+    } @else {
+      <app-cabecera-invitado />
+    }
+  </div>
+
+  <div class="contenedor">
+    <p id="cabecera-estado" class="cab__estado" aria-live="polite">
+      @if (cerrando()) {
+        <span class="solo-lectores">Cerrando sesión. Espera un momento.</span>
+      } @else if (errorCierre(); as e) {
+        <span class="cab__error"><app-icono nombre="alert-circle" [trazo]="2" />{{ e }}</span>
+      }
+    </p>
+  </div>
+</header>

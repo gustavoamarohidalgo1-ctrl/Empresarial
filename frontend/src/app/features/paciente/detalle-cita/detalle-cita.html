@@ -1,0 +1,330 @@
+<app-encabezado-pagina [titulo]="titulo()" [migas]="migas()">
+  @if (citaVisible(); as c) {
+    <app-estado-cita junto-al-titulo [estado]="c.estado" [etiqueta]="c.estadoEtiqueta" />
+  }
+  <span acciones class="sincronizando" [class.sincronizando--activo]="sincronizando()" aria-hidden="true">
+    <app-icono nombre="refresh-cw" />
+    Actualizando…
+  </span>
+</app-encabezado-pagina>
+
+<!-- Región viva presente desde el inicio, para que los avisos que llegan después se anuncien. -->
+<div class="region-resultado" aria-live="polite" aria-atomic="true">
+  @if (mensaje(); as m) {
+    <div #avisoResultado class="foco-resultado" tabindex="-1">
+      <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+        <p>{{ m.texto }}</p>
+        @if (m.detalle) {
+          <p class="texto-sm">{{ m.detalle }}</p>
+        }
+        @if (m.reintentar || m.actualizar) {
+          <div class="acciones">
+            @if (m.reintentar) {
+              <button
+                type="button"
+                class="btn btn--primario"
+                (click)="reintentar()"
+                [disabled]="ocupado() || revalidando()"
+              >
+                <app-icono nombre="refresh-cw" />
+                Reintentar
+              </button>
+            }
+            @if (m.actualizar) {
+              <button
+                type="button"
+                class="btn"
+                [class.btn--cargando]="refrescando()"
+                (click)="actualizar()"
+                [disabled]="refrescando()"
+              >
+                {{ refrescando() ? 'Actualizando…' : 'Actualizar vista' }}
+              </button>
+            }
+          </div>
+        }
+      </app-aviso>
+    </div>
+  }
+</div>
+
+@if (desactualizado() && citaVisible()) {
+  <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+    <p>No pudimos actualizar la cita. Revisa tu conexión e inténtalo de nuevo.</p>
+    <div class="acciones">
+      <button type="button" class="btn btn--sm" (click)="revalidar()">
+        <app-icono nombre="refresh-cw" />
+        Volver a intentar
+      </button>
+    </div>
+  </app-aviso>
+}
+
+@switch (estadoCarga()) {
+  @case ('cargando') {
+    <div class="rejilla-principal" aria-busy="true">
+      <p class="solo-lectores" role="status">Cargando la cita…</p>
+      <div class="pila pila--lg" aria-hidden="true">
+        <div class="tarjeta tarjeta--destacada resumen">
+          <div class="resumen__principal">
+            <app-esqueleto forma="bloque" ancho="4.75rem" alto="5.5rem" />
+            <div class="resumen__cuando">
+              <app-esqueleto forma="titulo" ancho="80%" />
+              <app-esqueleto ancho="55%" />
+              <app-esqueleto forma="pildora" ancho="7rem" />
+            </div>
+          </div>
+          <div class="lista-datos lista-datos--rejilla resumen__datos">
+            @for (i of [1, 2, 3]; track i) {
+              <div><app-esqueleto ancho="5rem" /><app-esqueleto ancho="85%" /></div>
+            }
+          </div>
+        </div>
+        <div class="tarjeta">
+          <app-esqueleto forma="titulo" ancho="45%" />
+          <div class="esq-acciones">
+            <app-esqueleto forma="boton" alto="3.25rem" />
+            <app-esqueleto [lineas]="3" />
+          </div>
+        </div>
+      </div>
+      <div class="pila pila--lg" aria-hidden="true">
+        <div class="tarjeta">
+          <app-esqueleto forma="titulo" ancho="50%" />
+          <div class="esq-linea">
+            @for (i of [1, 2, 3]; track i) {
+              <div class="esq-linea__fila">
+                <app-esqueleto forma="circulo" alto="2.25rem" />
+                <div><app-esqueleto ancho="70%" /><app-esqueleto ancho="45%" /></div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @case ('no-encontrada') {
+    <div role="alert" class="tarjeta">
+      <app-estado-vacio
+        ilustracion="busqueda"
+        titulo="No encontramos esta cita"
+        texto="Puede que no exista o que no pertenezca a tu cuenta."
+      >
+        <a acciones class="btn btn--primario" routerLink="/paciente/citas"
+          ><app-icono nombre="arrow-left" />Volver a Mis citas</a
+        >
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('error') {
+    <div role="alert" class="tarjeta">
+      <app-estado-vacio
+        ilustracion="error"
+        titulo="No pudimos cargar la cita"
+        [texto]="errorCarga()"
+      >
+        <button acciones type="button" class="btn btn--primario" (click)="cargar()">
+          <app-icono nombre="refresh-cw" />
+          Reintentar
+        </button>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('listo') {
+    @if (cita(); as c) {
+      <div class="rejilla-principal" [attr.aria-busy]="refrescando()">
+        <div class="pila pila--lg">
+          <section class="tarjeta tarjeta--destacada resumen" aria-labelledby="titulo-datos">
+            <h2 id="titulo-datos" class="solo-lectores">Datos de la cita</h2>
+            <div class="resumen__principal">
+              <app-ficha-fecha aria-hidden="true" [fecha]="c.inicio" tamano="lg" destacada />
+              <div class="resumen__cuando">
+                <p class="resumen__fecha">
+                  <time [attr.datetime]="c.inicio">{{ c.inicio | fechaLima: 'dia' }}</time>
+                </p>
+                <p class="resumen__hora">
+                  <app-icono nombre="clock" />
+                  <strong
+                    ><time [attr.datetime]="c.inicio">{{ c.inicio | fechaLima: 'hora' }}</time> a
+                    <time [attr.datetime]="c.fin">{{ c.fin | fechaLima: 'hora' }}</time></strong
+                  >
+                  <span>(hora de Lima)</span>
+                </p>
+                @if (cuenta(); as t) {
+                  <p class="cuenta" [class.cuenta--hoy]="esHoy()">
+                    <app-icono nombre="hourglass" /> {{ t }}
+                  </p>
+                }
+              </div>
+            </div>
+            <dl class="lista-datos lista-datos--rejilla resumen__datos">
+              <div>
+                <dt><app-icono nombre="stethoscope" />Especialidad</dt>
+                <dd>{{ c.especialidad.nombre }}</dd>
+              </div>
+              <div>
+                <dt><app-icono nombre="user" />Profesional</dt>
+                <dd>{{ c.profesional.nombre }}</dd>
+              </div>
+              <div>
+                <dt><app-icono nombre="building" />Sede</dt>
+                <dd>{{ c.sede.nombre }}</dd>
+              </div>
+              @if (c.motivoCancelacion) {
+                <div class="resumen__motivo">
+                  <dt><app-icono nombre="x-circle" />Motivo de cancelación</dt>
+                  <dd>{{ c.motivoCancelacion.descripcion }}</dd>
+                </div>
+              }
+            </dl>
+          </section>
+
+          <section class="tarjeta" aria-labelledby="titulo-acciones">
+            <h2 id="titulo-acciones">Gestiona tu cita</h2>
+            @if (acciones().size === 0) {
+              <p class="sin-acciones">
+                <app-icono nombre="info" />
+                No hay acciones disponibles para esta cita en su estado actual.
+              </p>
+            } @else {
+              <ul class="lista-acciones">
+                @if (accionPrincipal(); as p) {
+                  @let d = presentacion[p];
+                  <li class="accion-principal">
+                    @if (d.ruta) {
+                      <a
+                        class="btn btn--primario btn--lg btn--bloque"
+                        [routerLink]="['/paciente/citas', c.id, d.ruta]"
+                        [attr.aria-describedby]="d.idNota"
+                        ><app-icono [nombre]="d.icono" />{{ d.texto }}</a
+                      >
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn btn--primario btn--lg btn--bloque"
+                        [class.btn--cargando]="accionEnCurso() === p"
+                        (click)="ejecutarDirecta(p)"
+                        [disabled]="ocupado() || revalidando()"
+                        [attr.aria-describedby]="d.idNota"
+                      >
+                        <app-icono [nombre]="d.icono" />{{ textoAccion(p) }}
+                      </button>
+                    }
+                    <p class="accion-principal__nota" [id]="d.idNota">{{ d.nota }}</p>
+                  </li>
+                }
+                @for (a of accionesSecundarias(); track a) {
+                  @let d = presentacion[a];
+                  <li class="accion" [class.accion--peligro]="d.peligro">
+                    <span class="accion__icono"><app-icono [nombre]="d.icono" /></span>
+                    <div class="accion__textos">
+                      @if (d.ruta) {
+                        <a
+                          class="accion__control"
+                          [routerLink]="['/paciente/citas', c.id, d.ruta]"
+                          [attr.aria-describedby]="d.idNota"
+                          >{{ d.texto }}</a
+                        >
+                      } @else {
+                        <button
+                          type="button"
+                          class="accion__control"
+                          (click)="ejecutarDirecta(a)"
+                          [disabled]="ocupado() || revalidando()"
+                          [attr.aria-describedby]="d.idNota"
+                        >
+                          {{ textoAccion(a) }}
+                        </button>
+                      }
+                      <p class="accion__nota" [id]="d.idNota">{{ d.nota }}</p>
+                    </div>
+                    <app-icono class="accion__flecha" nombre="chevron-right" />
+                  </li>
+                }
+              </ul>
+              @if (ocupado()) {
+                <p class="explicacion-deshabilitado" role="status">
+                  Procesando la acción. Los botones se habilitarán cuando termine.
+                </p>
+              } @else if (revalidando()) {
+                <p class="explicacion-deshabilitado" role="status">
+                  Comprobando los datos más recientes de la cita…
+                </p>
+              }
+            }
+          </section>
+
+          <app-preparacion-cita [cita]="c" />
+        </div>
+
+        <div class="pila pila--lg">
+          @if (c.ventanaLlegada; as v) {
+            <app-ventana-llegada
+              [ventana]="v"
+              [inicio]="c.inicio"
+              [fin]="c.fin"
+              [ahora]="ahora()"
+              [disponible]="puede('REGISTRAR_LLEGADA')"
+              [registradaEn]="c.llegadaRegistradaEn"
+            />
+          }
+
+          <section
+            class="tarjeta"
+            aria-labelledby="titulo-linea"
+            [attr.aria-busy]="estadoLinea() === 'cargando'"
+          >
+            <h2 id="titulo-linea">Línea de tiempo</h2>
+            @switch (estadoLinea()) {
+              @case ('cargando') {
+                <p class="solo-lectores" role="status">Cargando la línea de tiempo…</p>
+                <div class="esq-linea" aria-hidden="true">
+                  @for (i of [1, 2, 3]; track i) {
+                    <div class="esq-linea__fila">
+                      <app-esqueleto forma="circulo" alto="2.25rem" />
+                      <div><app-esqueleto ancho="70%" /><app-esqueleto ancho="45%" /></div>
+                    </div>
+                  }
+                </div>
+              }
+              @case ('error') {
+                <app-aviso tipo="error">
+                  <p>No pudimos cargar la línea de tiempo.</p>
+                  <div class="acciones">
+                    <button type="button" class="btn btn--sm" (click)="cargarLineaTiempo()">
+                      <app-icono nombre="refresh-cw" />
+                      Reintentar
+                    </button>
+                  </div>
+                </app-aviso>
+              }
+              @case ('listo') {
+                @if (eventos().length === 0) {
+                  <app-estado-vacio
+                    compacto
+                    ilustracion="historial"
+                    [nivel]="3"
+                    titulo="Aún no hay eventos"
+                    texto="Aún no hay eventos registrados para esta cita."
+                  />
+                } @else {
+                  <app-linea-tiempo
+                    [eventos]="eventos()"
+                    orden="desc"
+                    etiquetadoPor="titulo-linea"
+                  />
+                }
+              }
+            }
+          </section>
+        </div>
+      </div>
+
+      <div class="volver">
+        <a class="btn btn--fantasma" routerLink="/paciente/citas"
+          ><app-icono nombre="arrow-left" />Volver a Mis citas</a
+        >
+      </div>
+    }
+  }
+}

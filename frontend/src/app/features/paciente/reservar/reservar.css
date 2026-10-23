@@ -1,0 +1,162 @@
+:host {
+  display: block;
+}
+
+/* Paso a la izquierda y resumen fijo «Tu reserva» a la derecha (escritorio). */
+.reserva {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--e-6);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .reserva {
+    grid-template-columns: minmax(0, 1fr) 19rem;
+  }
+}
+
+/* ----- Tarjeta del paso ----- */
+
+.paso__cabecera {
+  margin-bottom: var(--e-5);
+}
+
+.tarjeta .paso__titulo {
+  margin: 0 0 var(--e-1);
+  font-size: var(--t-20);
+  line-height: 1.3;
+}
+
+.paso__titulo:focus-visible {
+  outline-offset: 4px;
+}
+
+.paso__ayuda {
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+}
+
+.paso__aviso {
+  margin-bottom: var(--e-5);
+}
+
+.paso__contenido {
+  min-height: 12rem;
+}
+
+/* Barra de navegación: fija abajo en móvil para no perder «Continuar» en listas largas. */
+.paso__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  margin-top: var(--e-5);
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--c-borde);
+}
+
+.paso__pie > .btn--primario {
+  margin-left: auto;
+}
+
+.paso__explicacion {
+  margin: var(--e-6) 0 0;
+  text-align: right;
+}
+
+@media (max-width: 47.99rem) {
+  .paso__pie {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-inline: calc(-1 * var(--e-5));
+    padding: var(--e-3) var(--e-5);
+    background: var(--c-superficie);
+  }
+
+  .paso__pie > .btn {
+    flex: 1 1 0;
+  }
+
+  .paso__explicacion {
+    text-align: left;
+  }
+}
+
+/* ----- Resumen lateral «Tu reserva» ----- */
+
+.resumen {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .resumen {
+    display: block;
+    position: sticky;
+    top: calc(var(--alto-cabecera) + var(--e-4));
+  }
+}
+
+.tarjeta .resumen__titulo {
+  margin: 0 0 var(--e-4);
+  font-size: var(--t-16);
+}
+
+.resumen__lista {
+  display: grid;
+  gap: var(--e-3);
+  margin: 0 0 var(--e-4);
+}
+
+.resumen__item {
+  padding-left: var(--e-3);
+  border-left: 3px solid var(--c-superficie-3);
+}
+
+.resumen__item--hecho {
+  border-left-color: var(--c-primario);
+}
+
+.resumen__item dt {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  color: var(--c-texto-2);
+  font-size: var(--t-12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  --icono-tamano: 0.875rem;
+}
+
+.resumen__item dd {
+  margin: var(--e-1) 0 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+  overflow-wrap: anywhere;
+}
+
+.resumen__item--hecho dd {
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+.resumen__nota {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  margin: 0;
+  padding-top: var(--e-3);
+  border-top: 1px solid var(--c-borde);
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  --icono-tamano: 1rem;
+}
+
+.resumen__nota app-icono {
+  margin-top: 0.1em;
+  color: var(--c-acento);
+}

@@ -1,0 +1,151 @@
+<app-encabezado-pagina titulo="Mis citas" [subtitulo]="subtitulo()">
+  <a acciones class="btn btn--primario" routerLink="/paciente/reservar">
+    <app-icono nombre="calendar-plus" />
+    Reservar cita
+  </a>
+</app-encabezado-pagina>
+
+@if (cargandoProxima()) {
+  <app-proxima-cita class="destacada" [ahora]="ahora()" />
+} @else if (proxima(); as p) {
+  <app-proxima-cita class="destacada" [cita]="p" [ahora]="ahora()" />
+}
+
+<div class="segmentado segmentado--bloque pestanas" role="tablist" aria-label="Tipo de citas">
+  @for (p of pestanas; track p.alcance; let i = $index) {
+    <button
+      #pestana
+      type="button"
+      role="tab"
+      class="segmentado__opcion"
+      [id]="'pestana-' + p.alcance"
+      [attr.aria-selected]="alcance() === p.alcance"
+      aria-controls="panel-citas"
+      [tabIndex]="alcance() === p.alcance ? 0 : -1"
+      (click)="seleccionar(p.alcance)"
+      (keydown)="teclaPestana($event, i)"
+    >
+      <app-icono [nombre]="p.icono" />
+      {{ p.texto }}
+    </button>
+  }
+</div>
+
+<div
+  id="panel-citas"
+  class="panel"
+  role="tabpanel"
+  tabindex="0"
+  [attr.aria-labelledby]="'pestana-' + alcance()"
+  [attr.aria-busy]="carga().estado === 'cargando'"
+>
+  <p class="solo-lectores" aria-live="polite">{{ resumen() }}</p>
+
+  @switch (carga().estado) {
+    @case ('cargando') {
+      <p class="solo-lectores" role="status">Cargando tus citas…</p>
+      <div class="panel__cabecera" aria-hidden="true">
+        <app-esqueleto forma="titulo" ancho="10rem" />
+      </div>
+      <ul class="rejilla" aria-hidden="true">
+        @for (i of [1, 2, 3]; track i) {
+          <li><app-tarjeta-cita [ahora]="ahora()" /></li>
+        }
+      </ul>
+    }
+    @case ('error') {
+      <div role="alert">
+        <app-estado-vacio
+          ilustracion="error"
+          titulo="No pudimos cargar tus citas"
+          [texto]="mensajeError()"
+        >
+          <button acciones type="button" class="btn btn--primario" (click)="cargar()">
+            <app-icono nombre="refresh-cw" />
+            Reintentar
+          </button>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('listo') {
+      @if (desactualizado()) {
+        <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+          <p>No pudimos actualizar tus citas. Revisa tu conexión e inténtalo de nuevo.</p>
+          <div class="acciones">
+            <button type="button" class="btn btn--sm" (click)="cargar()">
+              <app-icono nombre="refresh-cw" />
+              Volver a intentar
+            </button>
+          </div>
+        </app-aviso>
+      }
+
+      @if (lista().length > 0) {
+        <div class="panel__cabecera">
+          <h2 class="panel__titulo">
+            {{ tituloLista() }}
+            <span class="insignia tabular"
+              >{{ lista().length
+              }}<span class="solo-lectores">
+                {{ lista().length === 1 ? 'cita' : 'citas' }}</span
+              ></span
+            >
+          </h2>
+          @if (actualizando()) {
+            <span class="actualizando" aria-hidden="true">
+              <app-icono nombre="refresh-cw" />
+              Actualizando…
+            </span>
+          }
+        </div>
+        <ul class="rejilla">
+          @for (cita of lista(); track cita.id) {
+            <li>
+              <app-tarjeta-cita
+                [cita]="cita"
+                [ahora]="ahora()"
+                [conCuenta]="alcance() === 'proximas'"
+              />
+            </li>
+          }
+        </ul>
+      } @else if (alcance() === 'historial') {
+        <app-estado-vacio
+          ilustracion="historial"
+          titulo="Aún no tienes citas en tu historial"
+          texto="Aquí verás las citas completadas, canceladas o a las que no asististe."
+        />
+      } @else if (proxima()) {
+        <div class="panel__cabecera">
+          <h2 class="panel__titulo">Más adelante</h2>
+        </div>
+        <p class="tarjeta tarjeta--suave panel__nota">
+          <app-icono nombre="calendar-check" />
+          No tienes otras citas programadas por ahora.
+        </p>
+      } @else {
+        <app-estado-vacio
+          ilustracion="calendario"
+          titulo="No tienes citas próximas"
+          texto="Reserva tu próxima consulta en pocos pasos: elige especialidad, profesional y horario."
+        >
+          <div acciones class="acciones vacio-acciones">
+            <a class="btn btn--primario" routerLink="/paciente/reservar">
+              <app-icono nombre="calendar-plus" />
+              Reservar cita
+            </a>
+            <button type="button" class="btn" (click)="seleccionar('historial')">
+              <app-icono nombre="clock" />
+              Ver mi historial
+            </button>
+          </div>
+        </app-estado-vacio>
+      }
+    }
+  }
+</div>
+
+<p class="privacidad texto-suave texto-sm">
+  <app-icono nombre="shield-check" />
+  <span>Solo ves tus propias citas: fecha, hora, sede, especialidad, profesional y estado.</span>
+</p>

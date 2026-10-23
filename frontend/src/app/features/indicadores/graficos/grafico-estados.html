@@ -1,0 +1,94 @@
+<app-marco-grafico titulo="Citas por estado" [descripcion]="descripcion()" [idBase]="id">
+  <div grafico class="ge">
+    <div class="ge__dona" (pointerleave)="ocultar()">
+      <svg
+        class="ge__svg"
+        viewBox="0 0 200 200"
+        role="group"
+        [attr.aria-labelledby]="id + '-titulo'"
+        [attr.aria-describedby]="id + '-descripcion ' + id + '-instrucciones'"
+        (keydown)="teclado($event)"
+      >
+        <circle class="ge__pista" cx="100" cy="100" r="81" aria-hidden="true" />
+        @for (s of sectores(); track s.estado; let i = $index) {
+          <path
+            class="ge__sector"
+            role="img"
+            [attr.data-estado]="s.estado"
+            [class.ge__sector--atenuado]="activo() !== null && activo() !== s.estado"
+            [attr.d]="s.d"
+            [attr.aria-label]="s.descripcion"
+            [attr.tabindex]="i === foco() ? 0 : -1"
+            (focus)="alEnfocar(i, s.estado)"
+            (blur)="ocultar()"
+            (pointerenter)="mostrar(s.estado)"
+          />
+        }
+        <g aria-hidden="true">
+          <text class="ge__centro-valor" x="100" y="96" text-anchor="middle">
+            {{ centro().valor }}
+          </text>
+          <text class="ge__centro-texto" x="100" y="118" text-anchor="middle">
+            {{ centro().texto }}
+          </text>
+          <text class="ge__centro-detalle" x="100" y="136" text-anchor="middle">
+            {{ centro().detalle }}
+          </text>
+        </g>
+      </svg>
+    </div>
+
+    <ul class="ge__leyenda" aria-label="Leyenda">
+      @for (f of filas(); track f.estado) {
+        <li
+          class="ge__fila"
+          [attr.data-estado]="f.estado"
+          [class.ge__fila--activa]="activo() === f.estado"
+          [class.ge__fila--vacia]="f.total === 0"
+          (pointerenter)="f.total > 0 && mostrar(f.estado)"
+          (pointerleave)="ocultar()"
+        >
+          <span class="ge__muestra" aria-hidden="true"></span>
+          <app-icono class="ge__icono" [nombre]="f.icono" />
+          <span class="ge__etiqueta">{{ f.etiqueta }}</span>
+          <span class="ge__cantidad tabular">{{ f.total }}</span>
+          <span class="ge__pct tabular">{{ f.textoPorcentaje }}</span>
+        </li>
+      }
+    </ul>
+    <p class="solo-lectores" [id]="id + '-instrucciones'">
+      Usa las flechas para recorrer los estados.
+    </p>
+  </div>
+
+  <div tabla class="tabla-contenedor">
+    <table class="tabla">
+      <caption class="solo-lectores">
+        Citas por estado
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Estado</th>
+          <th scope="col" class="num">Citas</th>
+          <th scope="col" class="num">% del total</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track f.estado) {
+          <tr>
+            <th scope="row">{{ f.etiqueta }}</th>
+            <td class="num">{{ f.total }}</td>
+            <td class="num">{{ f.textoPorcentaje }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total</th>
+          <td class="num">{{ totalCitas() }}</td>
+          <td class="num"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</app-marco-grafico>

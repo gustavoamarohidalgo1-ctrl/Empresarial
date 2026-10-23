@@ -1,0 +1,144 @@
+<app-marco-grafico [titulo]="titulo()" [descripcion]="descripcion()" [idBase]="id">
+  <div grafico class="gd">
+    <ul class="gd__leyenda" aria-label="Leyenda">
+      @for (s of series; track s.id) {
+        <li class="gd__leyenda-item">
+          <svg class="gd__muestra" viewBox="0 0 14 14" aria-hidden="true" focusable="false">
+            <rect class="serie" [attr.data-serie]="s.id" width="14" height="14" rx="3" />
+            @if (s.trama) {
+              <path class="trama" [attr.d]="tramaMuestra" />
+            }
+          </svg>
+          <span>{{ s.etiqueta }}</span>
+          <span class="gd__leyenda-total tabular">{{ totales()[s.id] }}</span>
+        </li>
+      }
+    </ul>
+
+    <div class="gd__lienzo" (pointerleave)="ocultar()">
+      <svg
+        class="gd__svg"
+        role="group"
+        [attr.width]="ancho()"
+        [attr.height]="alto"
+        [attr.viewBox]="'0 0 ' + ancho() + ' ' + alto"
+        [attr.aria-labelledby]="id + '-titulo'"
+        [attr.aria-describedby]="id + '-descripcion ' + id + '-instrucciones'"
+        (keydown)="teclado($event)"
+      >
+        <g aria-hidden="true">
+          @for (m of geo().marcas; track m.valor) {
+            <line
+              class="gd__rejilla"
+              [class.gd__rejilla--base]="m.valor === 0"
+              [attr.x1]="geo().izq"
+              [attr.x2]="geo().derecha"
+              [attr.y1]="m.y"
+              [attr.y2]="m.y"
+            />
+            <text class="gd__marca" text-anchor="end" [attr.x]="geo().izq - 8" [attr.y]="m.y + 4">
+              {{ m.texto }}
+            </text>
+          }
+          @for (c of geo().columnas; track c.clave) {
+            @if (c.etiqueta) {
+              <text class="gd__marca" text-anchor="middle" [attr.x]="c.centro" [attr.y]="alto - 8">
+                {{ c.etiqueta }}
+              </text>
+            }
+          }
+        </g>
+        @for (c of geo().columnas; track c.clave; let i = $index) {
+          <g
+            class="gd__columna"
+            role="img"
+            [class.gd__columna--activa]="activo() === i"
+            [attr.aria-label]="c.descripcion"
+            [attr.tabindex]="i === foco() ? 0 : -1"
+            (focus)="alEnfocar(i)"
+            (blur)="ocultar()"
+            (pointerenter)="mostrar(i)"
+          >
+            <rect
+              class="gd__zona"
+              [attr.x]="c.zonaX"
+              [attr.y]="arriba"
+              [attr.width]="c.zonaAncho"
+              [attr.height]="geo().altoPlot"
+            />
+            @for (s of c.segmentos; track s.id) {
+              <path class="serie" [attr.data-serie]="s.id" [attr.d]="s.d" />
+              @if (s.trama) {
+                <path class="trama" [attr.d]="s.trama" />
+              }
+            }
+          </g>
+        }
+      </svg>
+
+      @if (tooltip(); as t) {
+        <div
+          class="gd__tooltip"
+          aria-hidden="true"
+          [class.gd__tooltip--izquierda]="!t.derecha"
+          [style.left.px]="t.x"
+          [style.top.px]="t.y"
+        >
+          <p class="gd__tooltip-titulo">{{ t.titulo }}</p>
+          <ul class="gd__tooltip-filas">
+            @for (f of t.filas; track f.id) {
+              <li>
+                <span class="gd__tooltip-valor tabular">{{ f.valor }}</span>
+                <span class="gd__clave" [attr.data-serie]="f.id"></span>
+                <span class="gd__tooltip-etiqueta">{{ f.etiqueta }}</span>
+              </li>
+            }
+          </ul>
+          <p class="gd__tooltip-total">{{ t.total }}</p>
+        </div>
+      }
+    </div>
+    <p class="solo-lectores" [id]="id + '-instrucciones'">
+      Usa las flechas izquierda y derecha para recorrer las barras.
+    </p>
+  </div>
+
+  <div tabla class="tabla-contenedor">
+    <table class="tabla">
+      <caption class="solo-lectores">
+        {{
+          titulo()
+        }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">{{ encabezadoPeriodo() }}</th>
+          <th scope="col" class="num">Total</th>
+          @for (s of series; track s.id) {
+            <th scope="col" class="num">{{ s.etiqueta }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of puntos(); track p.clave) {
+          <tr>
+            <th scope="row" class="gd__celda-fecha">{{ p.larga }}</th>
+            <td class="num">{{ p.total }}</td>
+            @for (s of series; track s.id) {
+              <td class="num">{{ p[s.id] }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total del periodo</th>
+          <td class="num">{{ totales().total }}</td>
+          @for (s of series; track s.id) {
+            <td class="num">{{ totales()[s.id] }}</td>
+          }
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</app-marco-grafico>

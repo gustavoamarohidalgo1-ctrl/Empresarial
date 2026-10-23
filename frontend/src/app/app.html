@@ -1,0 +1,44 @@
+<a class="saltar-contenido" href="#contenido" (click)="saltarAlContenido($event)"
+  >Saltar al contenido</a
+>
+@if (esDesarrollo()) {
+  <p class="franja-entorno">
+    <app-icono nombre="info" [tamano]="14" />
+    <span>Entorno de pruebas · datos ficticios</span>
+  </p>
+}
+<app-cabecera />
+<main id="contenido" class="principal" [class.principal--completa]="anchoCompleto()" tabindex="-1">
+  <!-- Región viva siempre presente; el anuncio (AnuncioGlobalComponent) se crea en diferido. -->
+  <div
+    class="anuncio-global contenedor"
+    [class.anuncio-global--visible]="hayAnuncio()"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <ng-container #anclaAnuncio />
+  </div>
+  <div [class.contenedor]="!anchoCompleto()">
+    <router-outlet />
+  </div>
+</main>
+<footer class="pie">
+  <div class="contenedor pie__contenido">
+    <div class="pie__marca">
+      <app-marca tamano="sm" />
+      <p class="pie__lema">Citas de atención ambulatoria, claras y a tiempo.</p>
+    </div>
+    <nav class="pie__nav" aria-label="Enlaces legales">
+      <ul>
+        <li><a routerLink="/privacidad">Privacidad</a></li>
+        <li><a routerLink="/accesibilidad">Accesibilidad</a></li>
+      </ul>
+    </nav>
+    <p class="pie__legal">
+      <span>© {{ anio }} SIGA-SP</span>
+      <span class="pie__zona"
+        ><app-icono nombre="clock" [tamano]="14" /> Horarios en hora de Lima (GMT−5)</span
+      >
+    </p>
+  </div>
+</footer>

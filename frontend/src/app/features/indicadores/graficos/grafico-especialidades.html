@@ -1,0 +1,114 @@
+<app-marco-grafico
+  titulo="Citas e inasistencia por especialidad"
+  [descripcion]="descripcion()"
+  [idBase]="id"
+>
+  <div
+    grafico
+    class="gesp"
+    role="group"
+    [attr.aria-labelledby]="id + '-titulo'"
+    [attr.aria-describedby]="id + '-descripcion ' + id + '-instrucciones'"
+    (keydown)="teclado($event)"
+    (pointerleave)="ocultar()"
+  >
+    <div class="gesp__encabezado" aria-hidden="true">
+      <span>Especialidad</span>
+      <span><span class="gesp__clave gesp__clave--total"></span>Citas</span>
+      <span><span class="gesp__clave gesp__clave--tasa"></span>Inasistencia</span>
+    </div>
+    <ul class="gesp__filas">
+      @for (f of filas(); track f.codigo; let i = $index) {
+        <li
+          class="gesp__fila"
+          [class.gesp__fila--activa]="activo() === i"
+          [attr.tabindex]="i === foco() ? 0 : -1"
+          [attr.aria-label]="f.descripcion"
+          (focus)="alEnfocar(i, $event)"
+          (blur)="ocultar()"
+          (pointerenter)="mostrar(i, $event)"
+        >
+          <span class="gesp__nombre">{{ f.nombre }}</span>
+          <svg class="gesp__barra" width="100%" height="20" aria-hidden="true" focusable="false">
+            @if (f.total > 0) {
+              <rect
+                class="gesp__total"
+                x="0"
+                y="4"
+                height="12"
+                rx="3"
+                [attr.width]="f.anchoTotal + '%'"
+              />
+            }
+            <text class="gesp__cifra" y="14.5" dx="6" [attr.x]="f.anchoTotal + '%'">
+              {{ f.textoTotal }}
+            </text>
+          </svg>
+          <svg class="gesp__barra" width="100%" height="20" aria-hidden="true" focusable="false">
+            @if (f.tasa !== null && f.tasa > 0) {
+              <rect
+                class="gesp__tasa"
+                x="0"
+                y="4"
+                height="12"
+                rx="3"
+                [attr.width]="f.anchoTasa + '%'"
+              />
+            }
+            <text
+              class="gesp__cifra"
+              [class.gesp__cifra--nc]="f.tasa === null"
+              y="14.5"
+              [attr.dx]="f.tasa !== null && f.tasa > 0 ? 6 : 0"
+              [attr.x]="f.anchoTasa + '%'"
+            >
+              {{ f.textoTasa }}
+            </text>
+          </svg>
+        </li>
+      }
+    </ul>
+
+    @if (tooltip(); as t) {
+      <div class="gesp__tooltip" aria-hidden="true" [style.top.px]="tooltipTop()">
+        <p class="gesp__tooltip-titulo">{{ t.nombre }}</p>
+        <p class="sin-margen">
+          <strong class="tabular">{{ t.textoTotal }}</strong>
+          {{ t.total === 1 ? 'cita' : 'citas' }} · {{ t.pctTotal }} del total
+        </p>
+        <p class="sin-margen">
+          Inasistencia: <strong class="tabular">{{ t.textoTasa }}</strong>
+        </p>
+      </div>
+    }
+    <p class="solo-lectores" [id]="id + '-instrucciones'">
+      Usa las flechas arriba y abajo para recorrer las especialidades.
+    </p>
+  </div>
+
+  <div tabla class="tabla-contenedor">
+    <table class="tabla">
+      <caption class="solo-lectores">
+        Citas e inasistencia por especialidad
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Especialidad</th>
+          <th scope="col" class="num">Citas</th>
+          <th scope="col" class="num">% del total</th>
+          <th scope="col" class="num">Inasistencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (f of filas(); track f.codigo) {
+          <tr>
+            <th scope="row">{{ f.nombre }}</th>
+            <td class="num">{{ f.textoTotal }}</td>
+            <td class="num">{{ f.pctTotal }}</td>
+            <td class="num">{{ f.textoTasa }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</app-marco-grafico>

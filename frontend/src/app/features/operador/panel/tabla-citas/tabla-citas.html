@@ -1,0 +1,109 @@
+@if (cargando()) {
+  <div class="contenedor-citas" aria-hidden="true">
+    <table class="tabla citas">
+      <thead>
+        <tr>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Profesional</th>
+          <th>Estado</th>
+          <th>Llegada</th>
+          <th class="citas__col-acciones">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (i of filasEsqueleto; track i) {
+          <tr class="cita">
+            <td class="cita__hora"><app-esqueleto forma="titulo" ancho="3rem" /></td>
+            <td class="cita__paciente"><app-esqueleto [lineas]="2" ancho="75%" /></td>
+            <td class="cita__profesional"><app-esqueleto [lineas]="2" ancho="80%" /></td>
+            <td class="cita__estado"><app-esqueleto forma="pildora" ancho="6.5rem" /></td>
+            <td class="cita__llegada"><app-esqueleto ancho="3.5rem" /></td>
+            <td class="cita__acciones"><app-esqueleto forma="boton" ancho="9rem" /></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else {
+  <div class="contenedor-citas">
+    <table class="tabla citas" role="table">
+      <caption class="solo-lectores">
+        {{
+          leyenda()
+        }}
+      </caption>
+      <thead role="rowgroup">
+        <tr role="row">
+          <th scope="col" role="columnheader">Hora</th>
+          <th scope="col" role="columnheader">Paciente</th>
+          <th scope="col" role="columnheader">Profesional</th>
+          <th scope="col" role="columnheader">Estado</th>
+          <th scope="col" role="columnheader">Llegada</th>
+          <th scope="col" role="columnheader" class="citas__col-acciones">Acciones</th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        @for (c of citas(); track c.id) {
+          <tr
+            role="row"
+            class="cita"
+            [class.cita--en-curso]="enCurso()?.id === c.id"
+            [class.cita--cerrada]="esCerrada(c)"
+            [attr.data-cita]="c.codigo"
+          >
+            <td role="cell" class="cita__hora">
+              <time [attr.datetime]="c.inicio">{{ c.inicio | fechaLima: 'hora' }}</time>
+            </td>
+            <th scope="row" role="rowheader" class="cita__paciente">
+              <span class="cita__nombre">{{ c.pacienteNombre }}</span>
+              <span class="cita__codigo"> {{ c.codigo }}</span>
+            </th>
+            <td role="cell" class="cita__profesional">
+              <app-icono class="cita__icono-movil" nombre="user" />
+              <span class="cita__pro">{{ c.profesional.nombre }}</span>
+              <span class="cita__especialidad"> {{ c.especialidad.nombre }}</span>
+            </td>
+            <td role="cell" class="cita__estado">
+              <app-estado-cita [estado]="c.estado" [etiqueta]="c.estadoEtiqueta" />
+            </td>
+            <td role="cell" class="cita__llegada">
+              <app-icono class="cita__icono-movil" nombre="map-pin" />
+              <span class="cita__etiqueta-movil" aria-hidden="true">Llegada:</span>
+              @if (c.llegadaRegistradaEn) {
+                <time [attr.datetime]="c.llegadaRegistradaEn">{{
+                  c.llegadaRegistradaEn | fechaLima: 'hora'
+                }}</time>
+              } @else {
+                <span class="texto-suave">Sin registro</span>
+              }
+            </td>
+            <td role="cell" class="cita__acciones">
+              @if (c.accionesPermitidas.length === 0) {
+                <span class="cita__sin-acciones">Sin acciones disponibles</span>
+              } @else {
+                <div class="cita__botones">
+                  @for (a of c.accionesPermitidas; track a; let primera = $first) {
+                    <button
+                      type="button"
+                      class="btn btn--sm"
+                      [class.btn--primario]="primera"
+                      [class.btn--cargando]="enCurso()?.id === c.id && enCurso()?.accion === a"
+                      (click)="accion.emit({ cita: c, accion: a })"
+                      [attr.aria-disabled]="enCurso() ? 'true' : null"
+                      [attr.aria-describedby]="enCurso() ? idExplicacion() : null"
+                    >
+                      <app-icono [nombre]="iconoAccion[a]" />
+                      {{ etiquetaAccion[a]
+                      }}<span class="solo-lectores">: {{ c.codigo }}, {{ c.pacienteNombre }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

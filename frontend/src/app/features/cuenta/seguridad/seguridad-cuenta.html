@@ -1,0 +1,123 @@
+<section class="tarjeta seguridad" aria-labelledby="seguridad-titulo">
+  <div class="seguridad__cabecera">
+    <span class="seguridad__icono" aria-hidden="true"><app-icono nombre="lock" /></span>
+    <div class="seguridad__textos">
+      <h2 id="seguridad-titulo" class="seguridad__titulo">Contraseña</h2>
+      <p class="seguridad__texto">
+        Usa una contraseña que no uses en otros servicios. Al cambiarla, cerramos las demás sesiones
+        abiertas de tu cuenta.
+      </p>
+    </div>
+  </div>
+
+  <div aria-live="polite" aria-atomic="true">
+    @if (resultado(); as r) {
+      <div #avisoRef class="foco-resultado seguridad__resultado" tabindex="-1">
+        <app-aviso [tipo]="r.tipo" [titulo]="r.titulo">
+          <p>{{ r.texto }}</p>
+        </app-aviso>
+      </div>
+    }
+  </div>
+
+  @if (!abierto()) {
+    <div class="seguridad__fila">
+      <div>
+        <p class="seguridad__dato"><app-icono nombre="key-round" /> Contraseña</p>
+        <p class="seguridad__valor" aria-hidden="true">••••••••••</p>
+      </div>
+      <button #botonCambiar type="button" class="btn btn--sm" (click)="abrir()">
+        Cambiar contraseña
+      </button>
+    </div>
+  } @else {
+    <form
+      class="seguridad__formulario"
+      [formGroup]="formulario"
+      (ngSubmit)="guardar()"
+      novalidate
+      aria-labelledby="seguridad-form-titulo"
+      [attr.aria-busy]="guardando()"
+    >
+      <h3 id="seguridad-form-titulo" class="seguridad__subtitulo">Cambiar contraseña</h3>
+
+      <div class="campo">
+        <label for="seguridad-actual">Contraseña actual</label>
+        <app-campo-clave
+          #campoActual
+          idCampo="seguridad-actual"
+          nombre="contraseña actual"
+          formControlName="actual"
+          autocompletar="current-password"
+          (input)="limpiarErrorServidor('actual')"
+          [invalido]="!!errorDe('actual')"
+          [describedby]="describir('actual')"
+        />
+        @if (errorDe('actual'); as e) {
+          <p id="seguridad-actual-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="seguridad-nueva">Nueva contraseña</label>
+        <app-campo-clave
+          #campoNueva
+          idCampo="seguridad-nueva"
+          nombre="nueva contraseña"
+          formControlName="nueva"
+          autocompletar="new-password"
+          (input)="limpiarErrorServidor('nueva')"
+          [invalido]="!!errorDe('nueva')"
+          [describedby]="describir('nueva', 'seguridad-clave-requisitos')"
+        />
+        @if (errorDe('nueva'); as e) {
+          <p id="seguridad-nueva-error" class="error-campo">{{ e }}</p>
+        }
+        <app-medidor-clave idBase="seguridad-clave" [clave]="nueva()" [correo]="correo()" />
+      </div>
+
+      <div class="campo">
+        <label for="seguridad-confirmacion">Confirma la nueva contraseña</label>
+        <app-campo-clave
+          #campoConfirmacion
+          idCampo="seguridad-confirmacion"
+          nombre="confirmación de contraseña"
+          formControlName="confirmacion"
+          autocompletar="new-password"
+          teclaEnter="done"
+          [invalido]="!!errorDe('confirmacion')"
+          [describedby]="describir('confirmacion')"
+        />
+        @if (errorDe('confirmacion'); as e) {
+          <p id="seguridad-confirmacion-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+
+      <div class="acciones">
+        <button
+          type="submit"
+          class="btn btn--primario"
+          [class.btn--cargando]="guardando()"
+          [disabled]="guardando()"
+          [attr.aria-describedby]="guardando() ? 'seguridad-guardando' : null"
+        >
+          <app-icono nombre="check" /> Guardar contraseña
+        </button>
+        <button
+          type="button"
+          class="btn btn--fantasma"
+          (click)="cancelar()"
+          [disabled]="guardando()"
+          [attr.aria-describedby]="guardando() ? 'seguridad-guardando' : null"
+        >
+          Cancelar
+        </button>
+      </div>
+      @if (guardando()) {
+        <p id="seguridad-guardando" class="explicacion-deshabilitado" role="status">
+          Guardando tu nueva contraseña. Espera un momento.
+        </p>
+      }
+    </form>
+  }
+</section>

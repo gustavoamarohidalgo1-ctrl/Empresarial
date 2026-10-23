@@ -1,0 +1,48 @@
+# =====================================================================
+# Perfil de desarrollo local: BD del proyecto (scripts/db.sh), datos
+# sintéticos de demostración, reloj simulable y documentación de la API.
+# =====================================================================
+spring:
+  datasource:
+    url: ${SIGASP_DB_URL:jdbc:postgresql://localhost:5433/siga_sp}
+    username: ${SIGASP_DB_USER:siga}
+    password: ${SIGASP_DB_PASSWORD:siga-dev-local}
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+sigasp:
+  dev:
+    # Buzón público del correo simulado (GET /api/v1/dev/correos). También hace que correo_simulado guarde el
+    # cuerpo y el enlace (con el token). Nunca en producción.
+    buzon-correos: true
+  correo:
+    # Origen del frontend para los enlaces absolutos del cuerpo de los correos simulados (ng serve hace de
+    # proxy de la API). Si se quita, el enlace usa el origen de la solicitud.
+    url-base: http://localhost:4200
+  seguridad:
+    # Con ng serve todas las solicitudes llegan por el proxy desde 127.0.0.1 y comparten el cupo por IP:
+    # en local se suben los límites (en producción son 5).
+    registro:
+      max-por-ip: 100
+    recuperacion:
+      max-solicitudes: 100
+  reloj:
+    ajustable: true
+  demo:
+    habilitado: true
+    # Contraseña de las cuentas sintéticas de demostración (solo entorno local).
+    password: ${SIGASP_DEMO_PASSWORD:SigaSp-Demo-2026}
+
+logging:
+  level:
+    pe.edu.utp.sigasp: DEBUG

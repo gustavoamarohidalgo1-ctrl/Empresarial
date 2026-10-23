@@ -1,0 +1,211 @@
+<app-encabezado-pagina
+  titulo="Reservar cita"
+  subtitulo="Reserva en cuatro pasos. Todas las horas están en hora de Lima."
+  [migas]="migas"
+/>
+
+@if (exito(); as e) {
+  <app-reserva-exito
+    [citaId]="e.id"
+    [cita]="e.cita"
+    [cargandoCita]="e.cargando"
+    [horario]="horario()"
+    [especialidadNombre]="especialidadElegida()?.nombre ?? ''"
+  />
+} @else {
+  <app-progreso-reserva
+    [pasos]="pasos"
+    [actual]="paso()"
+    [bloqueado]="enviando()"
+    (irA)="irA($event)"
+  />
+
+  <div class="reserva">
+    <section class="tarjeta paso" aria-labelledby="titulo-paso">
+      <header class="paso__cabecera">
+        <h2 id="titulo-paso" class="paso__titulo" tabindex="-1">
+          <span class="solo-lectores">Paso {{ paso() }} de {{ pasos.length }}: </span
+          >{{ encabezado().titulo }}
+        </h2>
+        <p class="paso__ayuda">{{ encabezado().ayuda }}</p>
+      </header>
+
+      <div aria-live="polite" aria-atomic="true">
+        @if (mensaje(); as m) {
+          <div #avisoResultado class="foco-resultado paso__aviso" tabindex="-1">
+            <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+              <p>{{ m.texto }}</p>
+              @if (m.reintentar || m.limite || m.otroHorario) {
+                <div class="acciones">
+                  @if (m.reintentar) {
+                    <button
+                      type="button"
+                      class="btn btn--primario"
+                      [class.btn--cargando]="enviando()"
+                      [attr.aria-disabled]="enviando() || null"
+                      (click)="confirmar()"
+                    >
+                      <app-icono nombre="refresh-cw" /> Reintentar
+                    </button>
+                  }
+                  @if (m.limite) {
+                    <a class="btn btn--primario" routerLink="/paciente/citas">
+                      <app-icono nombre="calendar" /> Ir a Mis citas
+                    </a>
+                  }
+                  @if (m.limite || m.otroHorario) {
+                    <button type="button" class="btn" (click)="elegirOtroHorario()">
+                      <app-icono nombre="calendar-clock" /> Elegir otra fecha u hora
+                    </button>
+                  }
+                </div>
+              }
+            </app-aviso>
+          </div>
+        }
+      </div>
+
+      <div class="paso__contenido">
+        @switch (paso()) {
+          @case (1) {
+            <app-paso-especialidad
+              [especialidades]="listaEspecialidades()"
+              [estado]="estadoEspecialidades()"
+              [error]="errorEspecialidades()"
+              [seleccionada]="especialidadCodigo()"
+              (elegir)="elegirEspecialidad($event)"
+              (reintentar)="cargarEspecialidades()"
+            />
+          }
+          @case (2) {
+            <app-paso-profesional
+              [profesionales]="listaProfesionales()"
+              [estado]="estadoProfesionales()"
+              [error]="errorProfesionales()"
+              [especialidadNombre]="especialidadElegida()?.nombre ?? ''"
+              [seleccionado]="profesionalCodigo()"
+              [resumen]="resumenProfesionales()"
+              [resumenError]="errorResumen()"
+              [ahora]="ahora()"
+              (elegir)="elegirProfesional($event)"
+              (reintentar)="cargarProfesionales()"
+              (cambiarEspecialidad)="irA(1)"
+            />
+          }
+          @case (3) {
+            <app-paso-horario
+              [horarios]="listaHorarios()"
+              [estado]="estadoHorarios()"
+              [error]="errorHorarios()"
+              [seleccionado]="horario()?.horarioId ?? null"
+              [diaElegido]="diaElegido()"
+              [sede]="sedeFiltro()"
+              [mostrarProfesional]="cualquiera()"
+              [rango]="rango()"
+              [puedeRetroceder]="puedeRetroceder()"
+              [puedeAvanzar]="puedeAvanzar()"
+              (elegir)="elegirHorario($event)"
+              (elegirDia)="elegirDia($event)"
+              (elegirSede)="elegirSede($event)"
+              (cambiarVentana)="cambiarVentana($event)"
+              (actualizar)="actualizarHorarios()"
+              (cambiarProfesional)="irA(2)"
+            />
+          }
+          @case (4) {
+            @if (especialidadElegida(); as esp) {
+              @if (horario(); as h) {
+                <app-paso-confirmar
+                  [especialidad]="esp"
+                  [horario]="h"
+                  [sede]="sedeElegida()"
+                  [asignado]="cualquiera()"
+                  [ahora]="ahora()"
+                />
+              } @else {
+                <p class="texto-suave">Vuelve al paso anterior para elegir un horario.</p>
+              }
+            }
+          }
+        }
+      </div>
+
+      @if (faltante()) {
+        <p id="explicacion-continuar" class="explicacion-deshabilitado paso__explicacion">
+          {{ faltante() }}
+        </p>
+      }
+      @if (enviando()) {
+        <p id="explicacion-envio" class="explicacion-deshabilitado paso__explicacion" role="status">
+          Reservando tu cita. Espera un momento.
+        </p>
+      }
+      <div class="paso__pie">
+        @if (paso() > 1) {
+          <button
+            type="button"
+            class="btn"
+            [attr.aria-disabled]="enviando() || null"
+            (click)="atras()"
+          >
+            <app-icono nombre="arrow-left" /> Atrás
+          </button>
+        } @else {
+          <a class="btn btn--fantasma" routerLink="/paciente/citas">
+            <app-icono nombre="arrow-left" /> Mis citas
+          </a>
+        }
+        @if (paso() < 4) {
+          <button
+            type="button"
+            class="btn btn--primario"
+            [disabled]="!!faltante()"
+            [attr.aria-describedby]="faltante() ? 'explicacion-continuar' : null"
+            (click)="continuar()"
+          >
+            Continuar <app-icono nombre="arrow-right" />
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn btn--primario"
+            [class.btn--cargando]="enviando()"
+            [attr.aria-disabled]="enviando() || !horario() || null"
+            [attr.aria-describedby]="enviando() ? 'explicacion-envio' : null"
+            (click)="confirmar()"
+          >
+            <app-icono nombre="check" /> Confirmar reserva
+          </button>
+        }
+      </div>
+    </section>
+
+    <aside class="resumen" aria-labelledby="titulo-resumen">
+      <div class="tarjeta resumen__tarjeta">
+        <h2 id="titulo-resumen" class="resumen__titulo">Tu reserva</h2>
+        <dl class="resumen__lista">
+          <div class="resumen__item" [class.resumen__item--hecho]="!!especialidadElegida()">
+            <dt><app-icono nombre="stethoscope" /> Especialidad</dt>
+            <dd>{{ especialidadElegida()?.nombre ?? 'Por elegir' }}</dd>
+          </div>
+          <div class="resumen__item" [class.resumen__item--hecho]="!!textoProfesional()">
+            <dt><app-icono nombre="user" /> Profesional</dt>
+            <dd>{{ textoProfesional() ?? 'Por elegir' }}</dd>
+          </div>
+          <div class="resumen__item" [class.resumen__item--hecho]="!!textoHorario()">
+            <dt><app-icono nombre="calendar-clock" /> Fecha y hora</dt>
+            <dd>{{ textoHorario() ?? 'Por elegir' }}</dd>
+          </div>
+          <div class="resumen__item" [class.resumen__item--hecho]="!!horario()">
+            <dt><app-icono nombre="building" /> Sede</dt>
+            <dd>{{ horario()?.sede.nombre ?? 'Según el horario' }}</dd>
+          </div>
+        </dl>
+        <p class="resumen__nota">
+          <app-icono nombre="shield-check" />
+          <span>El horario no queda reservado hasta que confirmas en el último paso.</span>
+        </p>
+      </div>
+    </aside>
+  </div>
+}

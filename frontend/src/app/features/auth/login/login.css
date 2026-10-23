@@ -1,0 +1,316 @@
+/* Login partido: panel de marca (≥ 56rem) + formulario. En móvil, solo el formulario. */
+:host {
+  display: block;
+}
+
+.login {
+  display: grid;
+  max-width: 30rem;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-bloque);
+  background: var(--c-superficie);
+  box-shadow: var(--sombra-2);
+}
+
+/* ----- Formulario ----- */
+
+.login__formulario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--e-8) var(--e-5);
+}
+
+.login__contenido {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.login__marca-movil {
+  margin-bottom: var(--e-5);
+}
+
+.login__antetitulo {
+  margin: 0 0 var(--e-1);
+  color: var(--c-primario);
+  font-size: var(--t-14);
+  font-weight: 600;
+}
+
+.login__titulo {
+  margin-bottom: var(--e-2);
+}
+
+.login__intro {
+  margin-bottom: var(--e-6);
+  color: var(--c-texto-2);
+}
+
+.login__clave {
+  position: relative;
+}
+
+.login__clave .control {
+  padding-inline-end: 6rem;
+}
+
+.login__ver {
+  --btn-texto: var(--c-enlace);
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.25rem;
+  min-height: 0;
+}
+
+/* Región viva del aviso de Bloq Mayús: vacía, no añade separación al campo. */
+.login__vivo:empty {
+  margin-top: calc(-1 * var(--e-2));
+}
+
+.login__mayus {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  color: var(--c-advertencia);
+  font-weight: 600;
+  --icono-tamano: 1rem;
+}
+
+.login__enviar {
+  margin-top: var(--e-2);
+}
+
+/* Cargando: el texto sigue visible («Iniciando sesión…») con el spinner delante. */
+.login__enviar.btn--cargando {
+  color: var(--btn-texto);
+}
+
+.login__enviar.btn--cargando::after {
+  position: static;
+  order: -1;
+  margin: 0;
+}
+
+.login__estado {
+  text-align: center;
+}
+
+.login__etiqueta-clave {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-1) var(--e-3);
+}
+
+.login__olvido {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem; /* objetivo de 24 px (WCAG 2.5.8) */
+  font-size: var(--t-14);
+  font-weight: 600;
+}
+
+.login__ayuda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-1) var(--e-2);
+  margin: var(--e-6) 0 0;
+  padding-top: var(--e-5);
+  border-top: 1px solid var(--c-borde);
+  color: var(--c-texto-2);
+}
+
+.login__crear {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-1);
+  min-height: var(--alto-control);
+  font-weight: 600;
+  --icono-tamano: 1rem;
+}
+
+/* ----- Panel de marca ----- */
+
+.login__panel {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .login__formulario {
+    padding: var(--e-10) var(--e-8);
+  }
+}
+
+@media (min-width: 56rem) {
+  .login {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    max-width: 64rem;
+    min-height: 36rem;
+  }
+
+  .login__marca-movil {
+    display: none;
+  }
+
+  /* Texto blanco sobre el violeta de la marca (≥ 5:1 en ambos temas; el velo solo oscurece). */
+  .login__panel {
+    --c-texto: var(--marca-simbolo);
+    --c-texto-2: color-mix(in srgb, var(--marca-simbolo) 88%, var(--marca-fondo));
+    --translucido: color-mix(in srgb, var(--marca-simbolo) 14%, transparent);
+    order: -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-6);
+    padding: var(--e-10);
+    color: var(--c-texto);
+    background-color: var(--marca-fondo);
+    background-image:
+      radial-gradient(
+        circle at 100% 0%,
+        color-mix(in srgb, var(--marca-acento) 18%, transparent),
+        transparent 42%
+      ),
+      radial-gradient(circle at 0% 100%, var(--translucido), transparent 48%),
+      linear-gradient(180deg, transparent 35%, var(--c-velo));
+  }
+}
+
+/* Isotipo «de vidrio» sobre el panel. */
+.login__marca {
+  --marca-fondo: var(--translucido);
+}
+
+.login__ilustracion {
+  display: block;
+  width: 100%;
+  max-width: 19rem;
+  height: auto;
+  margin: auto;
+  overflow: visible;
+  filter: drop-shadow(0 16px 20px var(--c-velo));
+}
+
+.i-pulso,
+.i-sello-check,
+.i-mas {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.i-pulso {
+  stroke: var(--marca-acento);
+  stroke-width: 2.5;
+}
+
+.i-tras {
+  fill: var(--marca-simbolo);
+  opacity: 0.16;
+}
+
+.i-tarjeta {
+  fill: var(--c-superficie);
+}
+
+.i-ficha {
+  fill: var(--c-primario-suave);
+}
+
+.i-ficha-cab,
+.i-ficha-dia {
+  fill: var(--c-primario);
+}
+
+.i-linea {
+  fill: var(--c-primario-borde);
+}
+
+.i-linea--suave {
+  fill: var(--c-superficie-3);
+}
+
+.i-pildora {
+  fill: var(--c-acento-suave);
+}
+
+.i-pildora-punto {
+  fill: var(--c-acento);
+}
+
+.i-sello {
+  fill: var(--marca-acento);
+}
+
+.i-sello-check {
+  stroke: var(--marca-fondo);
+  stroke-width: 3.5;
+}
+
+.i-chispa {
+  fill: var(--marca-simbolo);
+  opacity: 0.6;
+}
+
+.i-mas {
+  stroke: var(--marca-acento);
+  stroke-width: 3;
+}
+
+.login__panel-titulo {
+  max-width: 18ch;
+  margin-bottom: var(--e-5);
+  font-size: var(--t-24);
+}
+
+.login__beneficios {
+  display: grid;
+  gap: var(--e-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--t-14);
+}
+
+.login__beneficios li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-3);
+}
+
+.login__beneficios strong {
+  display: block;
+  font-size: var(--t-16);
+}
+
+.login__beneficio-texto {
+  color: var(--c-texto-2);
+}
+
+.login__beneficio-icono {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--translucido);
+  border-radius: var(--r-control);
+  background: var(--translucido);
+}
+
+.login__nota {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  --icono-tamano: 1rem;
+  margin: 0;
+  padding-top: var(--e-4);
+  border-top: 1px solid var(--translucido);
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+}

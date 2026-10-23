@@ -1,0 +1,19 @@
+# Perfil de pruebas: la BD la provee PostgreSQL embebido (ver soporte/PostgresEmbebido).
+server:
+  servlet:
+    session:
+      cookie:
+        secure: false
+
+sigasp:
+  reloj:
+    ajustable: true
+  tareas:
+    habilitadas: false
+  demo:
+    habilitado: false
+
+logging:
+  level:
+    root: WARN
+    pe.edu.utp.sigasp: INFO

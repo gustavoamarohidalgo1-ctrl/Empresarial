@@ -1,0 +1,258 @@
+<app-encabezado-pagina titulo="Pre-check-in" [subtitulo]="subtitulo()" [migas]="migas()">
+  @if (cita(); as c) {
+    <app-estado-cita junto-al-titulo tamano="sm" [estado]="c.estado" [etiqueta]="c.estadoEtiqueta" />
+  }
+</app-encabezado-pagina>
+
+@switch (estadoCarga()) {
+  @case ('cargando') {
+    <div aria-busy="true">
+      <p class="solo-lectores" role="status">Cargando tus datos…</p>
+      <div class="tarjeta centrada" aria-hidden="true">
+        <div class="fila esqueleto-cita">
+          <app-esqueleto forma="bloque" ancho="3.75rem" alto="4.75rem" />
+          <div class="esqueleto-pila">
+            <app-esqueleto forma="titulo" ancho="45%" />
+            <app-esqueleto ancho="85%" />
+          </div>
+        </div>
+        @for (i of [1, 2]; track i) {
+          <div class="paso">
+            <app-esqueleto forma="circulo" alto="2rem" />
+            <div class="esqueleto-pila">
+              <app-esqueleto forma="titulo" ancho="60%" />
+              <app-esqueleto ancho="25%" />
+              <app-esqueleto forma="boton" />
+              <app-esqueleto ancho="25%" />
+              <app-esqueleto forma="boton" />
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+  @case ('no-encontrada') {
+    <div class="tarjeta centrada" role="alert">
+      <app-estado-vacio
+        ilustracion="busqueda"
+        titulo="No encontramos esta cita"
+        texto="Puede que no exista o que no pertenezca a tu cuenta."
+      >
+        <a acciones class="btn btn--primario" routerLink="/paciente/citas">
+          <app-icono nombre="arrow-left" /> Volver a Mis citas
+        </a>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('error') {
+    <div class="tarjeta centrada" role="alert">
+      <app-estado-vacio
+        ilustracion="error"
+        titulo="No pudimos cargar la información"
+        [texto]="errorCarga()"
+      >
+        <button acciones type="button" class="btn" (click)="cargar()">
+          <app-icono nombre="refresh-cw" /> Reintentar
+        </button>
+      </app-estado-vacio>
+    </div>
+  }
+  @case ('listo') {
+    @if (cita(); as c) {
+      <div class="centrada" aria-live="polite" aria-atomic="true">
+        @if (mensaje(); as m) {
+          <div #avisoResultado class="foco-resultado" tabindex="-1">
+            <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+              <p>{{ m.texto }}</p>
+              @if (m.reintentar || m.actualizar) {
+                <div class="acciones">
+                  @if (m.reintentar) {
+                    <button
+                      type="button"
+                      class="btn btn--primario"
+                      [class.btn--cargando]="enviando()"
+                      (click)="enviar()"
+                      [disabled]="enviando()"
+                    >
+                      <app-icono nombre="refresh-cw" /> Reintentar
+                    </button>
+                  }
+                  @if (m.actualizar) {
+                    <button type="button" class="btn" (click)="actualizar()">
+                      <app-icono nombre="refresh-cw" /> Actualizar vista
+                    </button>
+                  }
+                </div>
+              }
+            </app-aviso>
+          </div>
+        }
+      </div>
+
+      @if (desactualizada()) {
+        <div class="centrada">
+          <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+            <p>No pudimos actualizar tus datos. Revisa tu conexión e inténtalo de nuevo.</p>
+            <div class="acciones">
+              <button type="button" class="btn btn--sm" (click)="actualizar()">
+                <app-icono nombre="refresh-cw" /> Actualizar
+              </button>
+            </div>
+          </app-aviso>
+        </div>
+      }
+
+      @if (!permitido()) {
+        <div class="tarjeta centrada">
+          <app-estado-vacio
+            ilustracion="calendario"
+            titulo="El pre-check-in no está disponible"
+            [texto]="
+              'En su estado actual (' + c.estadoEtiqueta + '), esta cita no admite pre-check-in.'
+            "
+          >
+            <a acciones class="btn" [routerLink]="['/paciente/citas', c.id]">
+              <app-icono nombre="arrow-left" /> Volver al detalle
+            </a>
+          </app-estado-vacio>
+        </div>
+      } @else {
+        <section class="tarjeta centrada" aria-label="Pasos del pre-check-in">
+          <app-resumen-cita class="cita" [cita]="c" />
+
+          <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate [attr.aria-busy]="enviando()">
+            <ol class="pasos">
+              <li class="paso">
+                <span class="paso__numero" aria-hidden="true">1</span>
+                <div class="paso__cuerpo">
+                  <h2 id="titulo-datos-previos" class="paso__titulo">
+                    Revisa tus datos de contacto
+                  </h2>
+                  <p class="texto-suave texto-sm">
+                    Vienen de tu perfil. Si algo cambió, corrígelo aquí: se guardará en este
+                    pre-check-in, sin modificar tu perfil.
+                  </p>
+                  @if (perfil(); as p) {
+                    <p class="titular">
+                      <app-icono nombre="user" />
+                      <span><span class="texto-suave">Nombre:</span> {{ p.nombres }} {{ p.apellidos }}</span>
+                    </p>
+                  }
+
+                  <div class="campo">
+                    <label for="pci-email">Correo</label>
+                    <input
+                      #campoEmail
+                      id="pci-email"
+                      class="control"
+                      type="email"
+                      formControlName="email"
+                      autocomplete="email"
+                      spellcheck="false"
+                      (input)="limpiarErrorServidor('email')"
+                      [attr.aria-invalid]="!!errorDe('email')"
+                      [attr.aria-describedby]="
+                        errorDe('email') ? 'pci-email-ayuda pci-email-error' : 'pci-email-ayuda'
+                      "
+                    />
+                    <p id="pci-email-ayuda" class="ayuda">Por ejemplo: nombre@dominio.pe.</p>
+                    @if (errorDe('email'); as e) {
+                      <p id="pci-email-error" class="error-campo">{{ e }}</p>
+                    }
+                  </div>
+
+                  <div class="campo sin-margen">
+                    <label for="pci-telefono">Teléfono</label>
+                    <input
+                      #campoTelefono
+                      id="pci-telefono"
+                      class="control"
+                      type="tel"
+                      formControlName="telefono"
+                      autocomplete="tel"
+                      (input)="limpiarErrorServidor('telefono')"
+                      [attr.aria-invalid]="!!errorDe('telefono')"
+                      [attr.aria-describedby]="
+                        errorDe('telefono')
+                          ? 'pci-telefono-ayuda pci-telefono-error'
+                          : 'pci-telefono-ayuda'
+                      "
+                    />
+                    <p id="pci-telefono-ayuda" class="ayuda">Por ejemplo: +51 900 000 001.</p>
+                    @if (errorDe('telefono'); as e) {
+                      <p id="pci-telefono-error" class="error-campo">{{ e }}</p>
+                    }
+                  </div>
+                </div>
+              </li>
+
+              <li class="paso">
+                <span class="paso__numero" aria-hidden="true">2</span>
+                <div class="paso__cuerpo">
+                  <h2 class="paso__titulo">Confirma y envía</h2>
+                  <app-aviso tipo="info" titulo="El pre-check-in no registra tu llegada">
+                    <p>{{ textoPresencia }}</p>
+                  </app-aviso>
+
+                  <label class="casilla casilla--grande" for="pci-datos-correctos">
+                    <input id="pci-datos-correctos" type="checkbox" formControlName="datosCorrectos" />
+                    <span>Mis datos son correctos</span>
+                  </label>
+
+                  <button
+                    type="submit"
+                    class="btn btn--primario btn--lg btn--bloque"
+                    [class.btn--cargando]="enviando()"
+                    [disabled]="!datosCorrectos() || enviando() || revalidando()"
+                    [attr.aria-describedby]="
+                      !datosCorrectos() || enviando() || revalidando() ? 'pci-explicacion' : null
+                    "
+                  >
+                    <app-icono nombre="clipboard-check" /> Completar pre-check-in
+                  </button>
+                  @if (enviando()) {
+                    <p id="pci-explicacion" class="explicacion-deshabilitado" role="status">
+                      Enviando tus datos. Espera un momento.
+                    </p>
+                  } @else if (revalidando()) {
+                    <p id="pci-explicacion" class="explicacion-deshabilitado">
+                      Comprobando los datos más recientes de la cita…
+                    </p>
+                  } @else if (!datosCorrectos()) {
+                    <p id="pci-explicacion" class="explicacion-deshabilitado">
+                      Marca «Mis datos son correctos» para continuar.
+                    </p>
+                  }
+                </div>
+              </li>
+
+              <li class="paso paso--despues">
+                <span class="paso__numero" aria-hidden="true"><app-icono nombre="map-pin" /></span>
+                <div class="paso__cuerpo">
+                  <h2 class="paso__titulo">Después: el día de la cita, registra tu llegada</h2>
+                  @if (c.ventanaLlegada; as v) {
+                    <p class="texto-suave sin-margen">
+                      Podrás registrar tu llegada desde las {{ v.desde | fechaLima: 'hora' }} hasta
+                      antes de las {{ v.hasta | fechaLima: 'hora' }} del
+                      {{ v.desde | fechaLima: 'fecha' }} (hora de Lima).
+                    </p>
+                  } @else {
+                    <p class="texto-suave sin-margen">
+                      Hazlo al estar en la sede: es un paso aparte del pre-check-in.
+                    </p>
+                  }
+                </div>
+              </li>
+            </ol>
+          </form>
+
+          <div class="tarjeta__pie">
+            <a class="btn btn--fantasma" [routerLink]="['/paciente/citas', c.id]">
+              <app-icono nombre="arrow-left" /> Volver al detalle
+            </a>
+          </div>
+        </section>
+      }
+    }
+  }
+}

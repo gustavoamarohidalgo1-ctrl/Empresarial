@@ -1,0 +1,150 @@
+<section class="tarjeta fi" aria-labelledby="filtros-titulo">
+  <h2 id="filtros-titulo" class="fi__titulo" tabindex="-1">
+    <app-icono nombre="filtro" />
+    Filtros
+  </h2>
+
+  <fieldset class="fi__grupo">
+    <legend class="fi__etiqueta">Periodo</legend>
+    <div class="chips">
+      @for (p of presets; track p.id) {
+        <label class="chip">
+          <input
+            type="radio"
+            name="filtro-periodo"
+            [value]="p.id"
+            [checked]="presetElegido() === p.id"
+            (change)="elegirPreset(p.id)"
+          />
+          @if (presetElegido() === p.id) {
+            <app-icono nombre="check" />
+          }
+          {{ p.etiqueta }}
+        </label>
+      }
+    </div>
+  </fieldset>
+
+  @if (presetElegido() === 'personalizado') {
+    <div class="fi__rango" role="group" aria-labelledby="filtro-rango-titulo">
+      <p id="filtro-rango-titulo" class="solo-lectores">Periodo personalizado</p>
+      <div class="campo fi__campo">
+        <label for="filtro-desde">Desde</label>
+        <input
+          id="filtro-desde"
+          class="control"
+          type="date"
+          [value]="desde()"
+          (change)="cambiarFecha('desde', $event)"
+          [attr.aria-invalid]="errorRango() ? 'true' : null"
+          [attr.aria-describedby]="
+            errorRango() ? 'filtro-rango-ayuda filtro-rango-error' : 'filtro-rango-ayuda'
+          "
+        />
+      </div>
+      <div class="campo fi__campo">
+        <label for="filtro-hasta">Hasta</label>
+        <input
+          id="filtro-hasta"
+          class="control"
+          type="date"
+          [value]="hasta()"
+          (change)="cambiarFecha('hasta', $event)"
+          [attr.aria-invalid]="errorRango() ? 'true' : null"
+          [attr.aria-describedby]="
+            errorRango() ? 'filtro-rango-ayuda filtro-rango-error' : 'filtro-rango-ayuda'
+          "
+        />
+      </div>
+      <button type="button" class="btn btn--primario fi__aplicar" (click)="aplicarRango()">
+        <app-icono nombre="check" />
+        Aplicar periodo
+      </button>
+      <p id="filtro-rango-ayuda" class="ayuda fi__ayuda">
+        Fechas de Lima, ambos días incluidos. Máximo 366 días.
+      </p>
+      @if (errorRango(); as e) {
+        <p id="filtro-rango-error" class="error-campo fi__ayuda" role="alert">{{ e }}</p>
+      }
+    </div>
+  }
+
+  <div class="fi__selectores">
+    <div class="campo fi__campo">
+      <label for="filtro-sede">Sede</label>
+      <select id="filtro-sede" class="control" (change)="elegir('sede', $event)">
+        <option value="" [selected]="!filtro().sede">Todas las sedes</option>
+        @for (o of opcionesSede(); track o.codigo) {
+          <option [value]="o.codigo" [selected]="filtro().sede === o.codigo">{{ o.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="campo fi__campo">
+      <label for="filtro-especialidad">Especialidad</label>
+      <select id="filtro-especialidad" class="control" (change)="elegir('especialidad', $event)">
+        <option value="" [selected]="!filtro().especialidad">Todas las especialidades</option>
+        @for (o of opcionesEspecialidad(); track o.codigo) {
+          <option [value]="o.codigo" [selected]="filtro().especialidad === o.codigo">
+            {{ o.nombre }}
+          </option>
+        }
+      </select>
+    </div>
+    <div class="campo fi__campo">
+      <label for="filtro-profesional">Profesional</label>
+      <select
+        id="filtro-profesional"
+        class="control"
+        aria-describedby="filtro-profesional-ayuda"
+        (change)="elegir('profesional', $event)"
+      >
+        <option value="" [selected]="!filtro().profesional">Todos los profesionales</option>
+        @for (o of opcionesProfesional(); track o.codigo) {
+          <option [value]="o.codigo" [selected]="filtro().profesional === o.codigo">
+            {{ o.nombre }}
+          </option>
+        }
+      </select>
+      <p id="filtro-profesional-ayuda" class="solo-lectores">
+        @if (filtro().especialidad) {
+          Solo se listan los profesionales de la especialidad elegida.
+        } @else {
+          Lista de todos los profesionales.
+        }
+      </p>
+    </div>
+  </div>
+
+  @if (errorCatalogos()) {
+    <p class="fi__aviso" role="status">
+      <app-icono nombre="alert-triangle" />
+      <span>No pudimos cargar las listas de sedes, especialidades o profesionales.</span>
+      <button type="button" class="btn btn--sm btn--fantasma" (click)="reintentarCatalogos.emit()">
+        <app-icono nombre="refresh-cw" />
+        Reintentar
+      </button>
+    </p>
+  }
+
+  @if (chips().length) {
+    <div class="fi__activos">
+      <p id="filtros-activos" class="fi__etiqueta">Filtros activos</p>
+      <ul class="chips" aria-labelledby="filtros-activos">
+        @for (c of chips(); track c.id; let i = $index) {
+          <li>
+            <button type="button" class="chip fi__chip" (click)="quitar(c, i)">
+              <span>
+                {{ c.etiqueta }}: <strong>{{ c.valor }}</strong>
+              </span>
+              <app-icono nombre="x" />
+              <span class="solo-lectores">. Quitar este filtro</span>
+            </button>
+          </li>
+        }
+      </ul>
+      <button type="button" class="btn btn--sm btn--fantasma" (click)="limpiar()">
+        Limpiar filtros
+      </button>
+    </div>
+  }
+</section>

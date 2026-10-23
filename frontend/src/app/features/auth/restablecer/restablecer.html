@@ -1,0 +1,99 @@
+@if (enlaceInvalido()) {
+  <app-marco-auth
+    idTitulo="restablecer-titulo"
+    titulo="Este enlace ya no es válido"
+    intro="Puede que haya vencido (dura 30 minutos), que ya se haya usado o que esté incompleto. Pide uno nuevo para crear tu contraseña."
+  >
+    <div class="restablecer__invalido">
+      <span class="restablecer__sello" aria-hidden="true"
+        ><app-icono nombre="alert-triangle" [tamano]="28"
+      /></span>
+      <p class="texto-sm texto-suave">
+        Por tu seguridad, cada enlace funciona una sola vez. Si pediste varios, usa el más reciente.
+      </p>
+      <div class="acciones">
+        <a class="btn btn--primario" routerLink="/recuperar">
+          <app-icono nombre="mail" /> Pedir otro enlace
+        </a>
+        <a class="btn btn--fantasma" routerLink="/login">Volver a iniciar sesión</a>
+      </div>
+    </div>
+  </app-marco-auth>
+} @else {
+  <app-marco-auth
+    idTitulo="restablecer-titulo"
+    antetitulo="Recupera tu acceso"
+    titulo="Crea una contraseña nueva"
+    intro="Elige una contraseña que no uses en otros servicios. Al guardarla, cerraremos todas las sesiones abiertas de tu cuenta y podrás iniciar sesión con la nueva."
+  >
+    <div class="restablecer__avisos" aria-live="polite" aria-atomic="true">
+      @if (errorGeneral(); as e) {
+        <div #avisoRef class="foco-resultado" tabindex="-1">
+          <app-aviso tipo="error" [titulo]="e.titulo"
+            ><p>{{ e.texto }}</p></app-aviso
+          >
+        </div>
+      }
+    </div>
+
+    <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate [attr.aria-busy]="enviando()">
+      <div class="campo">
+        <label for="restablecer-password">Nueva contraseña</label>
+        <app-campo-clave
+          #campoClave
+          idCampo="restablecer-password"
+          nombre="nueva contraseña"
+          formControlName="password"
+          autocompletar="new-password"
+          (input)="errorServidorClave.set(null)"
+          [invalido]="!!errorClave()"
+          [describedby]="describirClave()"
+        />
+        @if (errorClave(); as e) {
+          <p id="restablecer-password-error" class="error-campo">{{ e }}</p>
+        }
+        <app-medidor-clave idBase="restablecer-clave" [clave]="clave()" />
+      </div>
+
+      <div class="campo">
+        <label for="restablecer-confirmacion">Confirma la nueva contraseña</label>
+        <app-campo-clave
+          #campoConfirmacion
+          idCampo="restablecer-confirmacion"
+          nombre="confirmación de contraseña"
+          formControlName="confirmacion"
+          autocompletar="new-password"
+          teclaEnter="done"
+          [invalido]="!!errorConfirmacion()"
+          [describedby]="errorConfirmacion() ? 'restablecer-confirmacion-error' : null"
+        />
+        @if (errorConfirmacion(); as e) {
+          <p id="restablecer-confirmacion-error" class="error-campo">{{ e }}</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn--primario btn--bloque btn--lg"
+        [class.btn--cargando]="enviando()"
+        [disabled]="enviando()"
+        [attr.aria-describedby]="enviando() ? 'restablecer-enviando' : null"
+      >
+        <app-icono nombre="key-round" /> Guardar contraseña
+      </button>
+      @if (enviando()) {
+        <p
+          id="restablecer-enviando"
+          class="explicacion-deshabilitado restablecer__estado"
+          role="status"
+        >
+          Guardando tu nueva contraseña. Espera un momento.
+        </p>
+      }
+    </form>
+
+    <p class="restablecer__pie">
+      <a routerLink="/login"><app-icono nombre="arrow-left" /> Volver a iniciar sesión</a>
+    </p>
+  </app-marco-auth>
+}

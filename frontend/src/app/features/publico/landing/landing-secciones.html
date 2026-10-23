@@ -1,0 +1,89 @@
+<section class="banda" aria-labelledby="landing-confianza">
+  <div class="contenedor">
+    <header class="cabecera-seccion">
+      <p class="cabecera-seccion__antetitulo">Seguridad y privacidad</p>
+      <h2 id="landing-confianza" class="cabecera-seccion__titulo">
+        Tu información, en buenas manos
+      </h2>
+      <p class="cabecera-seccion__texto">
+        Cuidamos tus datos personales y de salud con las mismas exigencias que tu atención.
+      </p>
+    </header>
+    <ul class="confianza">
+      @for (c of confianza(); track c.titulo) {
+        <li class="confianza__item">
+          <span class="confianza__icono"><app-icono [nombre]="c.icono" /></span>
+          <h3 class="confianza__titulo">{{ c.titulo }}</h3>
+          <p class="confianza__texto">{{ c.texto }}</p>
+          @if (c.enlace; as e) {
+            <a class="confianza__enlace" [routerLink]="e.ruta"
+              >{{ e.texto }} <app-icono nombre="arrow-right"
+            /></a>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="banda banda--suave" aria-labelledby="landing-equipo">
+  <div class="contenedor equipo">
+    <div class="equipo__texto">
+      <p class="cabecera-seccion__antetitulo">Para la sede</p>
+      <h2 id="landing-equipo" class="cabecera-seccion__titulo">
+        También para el equipo de atención
+      </h2>
+      <p class="cabecera-seccion__texto">
+        Admisión, responsables y administración trabajan con la misma información que ve el
+        paciente, en tiempo real y con trazabilidad completa.
+      </p>
+    </div>
+    <ul class="equipo__lista">
+      @for (e of equipo(); track e.titulo) {
+        <li>
+          <span class="equipo__icono"><app-icono [nombre]="e.icono" /></span>
+          <span>
+            <strong class="equipo__titulo">{{ e.titulo }}</strong>
+            <span class="equipo__descripcion">{{ e.texto }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="banda" aria-labelledby="landing-preguntas">
+  <div class="contenedor preguntas">
+    <header class="cabecera-seccion">
+      <p class="cabecera-seccion__antetitulo">Preguntas frecuentes</p>
+      <h2 id="landing-preguntas" class="cabecera-seccion__titulo">Resolvemos tus dudas</h2>
+    </header>
+    <div class="preguntas__lista">
+      @for (p of preguntas(); track p.pregunta) {
+        <details class="pregunta">
+          <summary class="pregunta__resumen">
+            <span>{{ p.pregunta }}</span>
+            <app-icono class="pregunta__chevron" nombre="chevron-down" />
+          </summary>
+          <p class="pregunta__respuesta">{{ p.respuesta }}</p>
+        </details>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="cta" aria-labelledby="landing-cta">
+  <div class="contenedor cta__contenido">
+    <app-marca class="cta__marca" tamano="lg" [conTexto]="false" />
+    <h2 id="landing-cta" class="cta__titulo">Tu próxima cita, a pocos clics</h2>
+    <p class="cta__texto">Crea tu cuenta en menos de dos minutos y reserva cuando lo necesites.</p>
+    <div class="acciones cta__acciones">
+      <a class="btn btn--lg cta__principal" routerLink="/registro">
+        <app-icono nombre="user-plus" /> Crear cuenta
+      </a>
+      <a class="btn btn--lg cta__secundario" routerLink="/login">
+        <app-icono nombre="log-in" /> Ya tengo cuenta
+      </a>
+    </div>
+  </div>
+</section>

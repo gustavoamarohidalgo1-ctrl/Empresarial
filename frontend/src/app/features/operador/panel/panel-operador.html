@@ -1,0 +1,252 @@
+<app-encabezado-pagina
+  titulo="Panel del operador"
+  tituloId="titulo-panel"
+  subtitulo="Registra el avance de la atención de las citas del día."
+>
+  <p class="panel__dia">
+    <app-icono class="panel__dia-icono" nombre="calendar" />
+    <time [attr.datetime]="fecha()">{{ diaLargo() }}</time>
+    @if (esHoy()) {
+      <span class="insignia insignia--acento">Hoy</span>
+    }
+    <span class="texto-suave">· Hora de Lima</span>
+  </p>
+</app-encabezado-pagina>
+
+<div class="barra">
+  <div class="barra__fecha" role="group" aria-labelledby="panel-fecha-etiqueta">
+    <label id="panel-fecha-etiqueta" class="barra__etiqueta" for="panel-fecha">Fecha</label>
+    <div class="barra__controles">
+      <button type="button" class="btn btn--icono" (click)="moverDia(-1)">
+        <app-icono nombre="chevron-left" /><span class="solo-lectores">Día anterior</span>
+      </button>
+      <input
+        #campoFecha
+        id="panel-fecha"
+        class="control barra__campo"
+        type="date"
+        [value]="fecha()"
+        (change)="cambiarFecha($event)"
+        [attr.aria-invalid]="!!errorFecha()"
+        [attr.aria-describedby]="errorFecha() ? 'panel-fecha-error' : null"
+      />
+      <button type="button" class="btn btn--icono" (click)="moverDia(1)">
+        <app-icono nombre="chevron-right" /><span class="solo-lectores">Día siguiente</span>
+      </button>
+      <button
+        type="button"
+        class="btn"
+        (click)="irAHoy()"
+        [attr.aria-disabled]="hoyBloqueado() ? 'true' : null"
+        [attr.aria-describedby]="hoyBloqueado() ? 'panel-hoy-nota' : null"
+      >
+        Hoy
+      </button>
+    </div>
+    @if (errorFecha(); as e) {
+      <p id="panel-fecha-error" class="error-campo">{{ e }}</p>
+    }
+    <p id="panel-hoy-nota" class="solo-lectores">Ya estás viendo las citas de hoy.</p>
+  </div>
+
+  <div class="barra__refresco">
+    <label class="interruptor" for="panel-auto">
+      <input
+        id="panel-auto"
+        type="checkbox"
+        role="switch"
+        [checked]="autoActualizar()"
+        (change)="cambiarAuto($event)"
+        aria-describedby="panel-auto-ayuda"
+      />
+      <span class="interruptor__pista" aria-hidden="true"></span>
+      Actualizar cada minuto
+    </label>
+    <p id="panel-auto-ayuda" class="solo-lectores">
+      Se pausa con la pestaña oculta, tras 15 minutos sin actividad, mientras se guarda una acción o
+      mientras recorres la lista.
+    </p>
+    <div class="barra__estado-fila">
+      <p class="barra__estado" [class.barra__estado--alerta]="desactualizado()">
+        @if (actualizando()) {
+          Actualizando…
+        } @else if (desactualizado()) {
+          <app-icono nombre="alert-triangle" />
+          <span>
+            No pudimos actualizar
+            @if (horaObtenido(); as h) {
+              · datos de las <time [attr.datetime]="h.iso">{{ h.texto }}</time>
+            }
+          </span>
+        } @else if (horaObtenido(); as h) {
+          <span
+            >Actualizado a las <time [attr.datetime]="h.iso">{{ h.texto }}</time></span
+          >
+        }
+      </p>
+      <button
+        type="button"
+        class="btn"
+        [class.btn--girando]="actualizando()"
+        (click)="actualizarDesdeBarra()"
+        [attr.aria-disabled]="actualizandoNormal() ? 'true' : null"
+      >
+        <app-icono nombre="refresh-cw" />
+        Actualizar
+      </button>
+    </div>
+  </div>
+</div>
+
+<p class="solo-lectores" role="status">{{ anuncio() }}</p>
+
+@if (estadoCarga() !== 'error') {
+  <section class="panel__resumen" aria-labelledby="titulo-resumen">
+    <h2 id="titulo-resumen" class="solo-lectores">Resumen del día</h2>
+    <app-indicadores-dia [resumen]="estadoCarga() === 'listo' ? resumen() : null" />
+  </section>
+}
+
+<div #regionResultado class="region-resultado" aria-live="polite" aria-atomic="true">
+  @if (mensaje(); as m) {
+    <div #avisoResultado class="foco-resultado" tabindex="-1">
+      <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+        <p>{{ m.texto }}</p>
+        @if (m.reintentar || m.actualizar) {
+          <div class="acciones">
+            @if (m.reintentar) {
+              <button
+                type="button"
+                class="btn btn--primario"
+                (click)="reintentar()"
+                [attr.aria-disabled]="enCurso() ? 'true' : null"
+              >
+                <app-icono nombre="refresh-cw" />
+                Reintentar
+              </button>
+            }
+            @if (m.actualizar) {
+              <button type="button" class="btn" (click)="actualizar()">Actualizar</button>
+            }
+          </div>
+        }
+      </app-aviso>
+    </div>
+  }
+</div>
+
+<section
+  class="lista"
+  aria-labelledby="titulo-citas-dia"
+  [attr.aria-busy]="estadoCarga() === 'cargando'"
+>
+  <div class="lista__cabecera">
+    <div class="lista__textos">
+      <h2 #tituloLista id="titulo-citas-dia" class="lista__titulo foco-resultado" tabindex="-1">
+        Citas del {{ fechaTexto() }}
+      </h2>
+      <p class="lista__meta">
+        <span id="panel-guardando" role="status">
+          @if (enCurso(); as ec) {
+            Guardando la acción de {{ ec.codigo }}. Las demás acciones se habilitarán al terminar.
+          }
+        </span>
+        @if (!enCurso() && estadoCarga() === 'listo') {
+          <span>
+            @if (filtro() === 'todas') {
+              {{ conteo().todas }} {{ conteo().todas === 1 ? 'cita' : 'citas' }} · ordenadas por
+              hora
+            } @else {
+              {{ citasVisibles().length }} de {{ conteo().todas }} · {{ etiquetaFiltro() }}
+            }
+          </span>
+        }
+      </p>
+    </div>
+
+    @switch (estadoCarga()) {
+      @case ('listo') {
+        <div class="chips lista__filtros" role="group" aria-label="Filtrar por estado">
+          @for (f of filtros; track f.id) {
+            <button
+              type="button"
+              class="chip"
+              [id]="'panel-filtro-' + f.id"
+              [attr.aria-pressed]="filtro() === f.id"
+              (click)="filtrar(f.id)"
+            >
+              {{ f.etiqueta }}
+              <span class="chip__contador"
+                >{{ conteo()[f.id]
+                }}<span class="solo-lectores">{{
+                  conteo()[f.id] === 1 ? ' cita' : ' citas'
+                }}</span></span
+              >
+            </button>
+          }
+        </div>
+      }
+      @case ('cargando') {
+        <div class="chips lista__filtros" aria-hidden="true">
+          @for (f of filtros; track f.id) {
+            <app-esqueleto forma="pildora" ancho="7rem" alto="2.5rem" />
+          }
+        </div>
+      }
+    }
+  </div>
+
+  @switch (estadoCarga()) {
+    @case ('cargando') {
+      <p class="solo-lectores" role="status">Cargando las citas del día…</p>
+      <app-tabla-citas-operador cargando />
+    }
+    @case ('error') {
+      <div role="alert" class="lista__vacio">
+        <app-estado-vacio
+          ilustracion="error"
+          titulo="No pudimos cargar las citas"
+          [texto]="errorCarga()"
+          [nivel]="3"
+        >
+          <button acciones type="button" class="btn btn--primario" (click)="reintentarCarga()">
+            <app-icono nombre="refresh-cw" />
+            Reintentar
+          </button>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('listo') {
+      @if (citas().length === 0) {
+        <div class="lista__vacio">
+          <app-estado-vacio
+            ilustracion="calendario"
+            titulo="No hay citas para esta fecha"
+            texto="Tus consultorios asignados no tienen citas registradas este día."
+            [nivel]="3"
+          />
+        </div>
+      } @else if (citasVisibles().length === 0) {
+        <div class="lista__vacio">
+          <app-estado-vacio
+            ilustracion="busqueda"
+            [titulo]="'Ninguna cita en «' + etiquetaFiltro() + '»'"
+            texto="Elige otro filtro o mira todas las citas del día."
+            [nivel]="3"
+            compacto
+          >
+            <button acciones type="button" class="btn" (click)="verTodas()">Ver todas</button>
+          </app-estado-vacio>
+        </div>
+      } @else {
+        <app-tabla-citas-operador
+          [citas]="citasVisibles()"
+          [leyenda]="leyendaTabla()"
+          [enCurso]="enCurso()"
+          idExplicacion="panel-guardando"
+          (accion)="ejecutar($event.cita, $event.accion)"
+        />
+      }
+    }
+  }
+</section>

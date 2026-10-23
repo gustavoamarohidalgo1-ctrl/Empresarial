@@ -1,0 +1,93 @@
+/* Tarjeta centrada: la consecuencia se explica antes de la acción. */
+.centrada {
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.cita {
+  margin-bottom: var(--e-5);
+  padding-bottom: var(--e-5);
+  border-bottom: 1px solid var(--c-borde);
+}
+
+.consecuencia {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  margin-bottom: var(--e-4);
+}
+
+.tarjeta .consecuencia__titulo {
+  margin: 0 0 var(--e-1);
+  font-size: var(--t-20);
+}
+
+.sello {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  --icono-tamano: 1.5rem;
+}
+
+.sello--peligro {
+  background: var(--c-error-suave);
+  color: var(--c-peligro);
+}
+
+.sello--exito {
+  background: var(--c-exito-suave);
+  color: var(--c-exito);
+}
+
+.consecuencias {
+  margin: var(--e-2) 0 0;
+  padding-left: var(--e-5);
+}
+
+.consecuencias li + li {
+  margin-top: var(--e-1);
+}
+
+/* Resultado */
+
+.resultado__cabecera {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--e-3);
+  margin-bottom: var(--e-5);
+  text-align: center;
+}
+
+.resultado__titulo {
+  margin: 0;
+  font-size: var(--t-24);
+}
+
+.bloque-datos {
+  margin-bottom: var(--e-4);
+  padding: var(--e-4);
+  border-radius: var(--r-control);
+  background: var(--c-superficie-2);
+}
+
+/* Esqueleto: mismo alto que el resumen de la cita (ficha md). */
+.esqueleto-cita {
+  flex-wrap: nowrap;
+  gap: var(--e-4);
+}
+
+.esqueleto-cita > app-esqueleto {
+  flex: none;
+}
+
+.esqueleto-cita__texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--e-2);
+}

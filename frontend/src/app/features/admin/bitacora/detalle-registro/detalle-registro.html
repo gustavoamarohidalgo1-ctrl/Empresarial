@@ -1,0 +1,105 @@
+@let e = entrada();
+@let v = vista();
+<aside class="tarjeta dr" [attr.aria-labelledby]="idTitulo">
+  <div class="dr__cabecera">
+    <div class="dr__textos">
+      <p class="dr__sobretitulo">Registro #{{ e.id }}</p>
+      <h2 class="dr__titulo" [id]="idTitulo" tabindex="-1">{{ v.accion }}</h2>
+    </div>
+    <button type="button" class="btn btn--icono btn--fantasma" (click)="cerrar.emit()">
+      <app-icono nombre="x" />
+      <span class="solo-lectores">Cerrar el detalle</span>
+    </button>
+  </div>
+
+  <app-resultado-auditoria [resultado]="e.resultado" />
+
+  <dl class="dr__datos">
+    <div>
+      <dt>Fecha y hora</dt>
+      <dd>
+        <time [attr.datetime]="e.ocurridoEn">{{ v.dia }}, {{ v.hora }}</time>
+        <span class="dr__secundario">Hora de Lima</span>
+      </dd>
+    </div>
+    <div>
+      <dt>Actor</dt>
+      <dd>
+        @if (v.actor; as a) {
+          {{ a.nombre }} <span class="insignia">{{ a.rol }}</span>
+          <code class="dr__codigo">{{ a.id }}</code>
+        } @else if (v.anonimo; as a) {
+          {{ a.nombre }} <span class="dr__secundario">{{ a.explicacion }}</span>
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Acción</dt>
+      <dd>
+        {{ v.accion }}
+        <code class="dr__codigo">{{ e.accion }}</code>
+      </dd>
+    </div>
+    <div>
+      <dt>Entidad</dt>
+      <dd>
+        {{ v.entidad }}
+        @if (e.entidadId; as entidadId) {
+          <span class="dr__copiable">
+            <code class="dr__codigo">{{ entidadId }}</code>
+            <button
+              type="button"
+              class="btn btn--sm btn--icono btn--fantasma"
+              (click)="copiar.emit({ valor: entidadId, descripcion: 'Referencia de la entidad' })"
+            >
+              <app-icono [nombre]="copiado() === entidadId ? 'check' : 'copy'" />
+              <span class="solo-lectores">Copiar la referencia de la entidad</span>
+            </button>
+          </span>
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Resultado</dt>
+      <dd>
+        {{ v.descripcionResultado }}
+        @if (e.codigo) {
+          <code class="dr__codigo">{{ e.codigo }}</code>
+          @if (v.mensajeCodigo) {
+            <span class="dr__secundario">{{ v.mensajeCodigo }}</span>
+          }
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>ID de solicitud</dt>
+      <dd>
+        @if (e.requestId; as requestId) {
+          <span class="dr__copiable">
+            <code class="dr__codigo">{{ requestId }}</code>
+            <button
+              type="button"
+              class="btn btn--sm btn--icono btn--fantasma"
+              (click)="copiar.emit({ valor: requestId, descripcion: 'ID de solicitud' })"
+            >
+              <app-icono [nombre]="copiado() === requestId ? 'check' : 'copy'" />
+              <span class="solo-lectores">Copiar el ID de solicitud</span>
+            </button>
+          </span>
+        } @else if (v.anonimo?.tipo === 'sistema') {
+          <span class="dr__secundario">Sin ID (acción del sistema)</span>
+        } @else {
+          <span class="dr__secundario">Sin ID de solicitud</span>
+        }
+      </dd>
+    </div>
+  </dl>
+
+  <p class="dr__nota">
+    <app-icono nombre="lock" />
+    <span>
+      Registro de solo lectura. Con el ID de solicitud puedes ubicar la operación en el registro del
+      servidor.
+    </span>
+  </p>
+</aside>

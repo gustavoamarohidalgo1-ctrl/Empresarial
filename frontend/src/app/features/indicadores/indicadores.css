@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+.btn--girando app-icono {
+  animation: girar 0.9s linear infinite;
+}
+
+/* ----- Contexto del periodo (título de los resultados) ----- */
+
+.ind {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+}
+
+.ind__contexto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-5);
+}
+
+.ind__titulo {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2) var(--e-3);
+  margin: 0;
+  font-size: var(--t-20);
+}
+
+.ind__rango {
+  font-variant-numeric: tabular-nums;
+}
+
+.ind__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-1) var(--e-4);
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+}
+
+.ind__dato {
+  --icono-tamano: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-1);
+}
+
+.ind__dato--estado {
+  color: var(--c-primario);
+  font-weight: 600;
+}
+
+.ind__dato--alerta app-icono {
+  color: var(--c-advertencia);
+}
+
+/* ----- Tarjetas ----- */
+
+.ind__tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--e-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ----- Gráficos ----- */
+
+.ind__contenido {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+  transition: opacity var(--dur-2) var(--curva);
+}
+
+/* Al cambiar el filtro se conserva lo anterior atenuado (sin saltos ni esqueletos). */
+.ind__contenido--actualizando {
+  opacity: 0.55;
+}
+
+.ind__graficos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+}
+
+.ind__fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--e-5);
+}
+
+@media (min-width: 64rem) {
+  .ind__fila {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+}
+
+.ind__esqueleto-grafico {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  min-height: 22rem;
+}
+
+.ind__esqueleto-grafico app-esqueleto[forma='circulo'] {
+  align-self: center;
+}
+
+.ind__vacio {
+  padding-block: var(--e-8);
+}

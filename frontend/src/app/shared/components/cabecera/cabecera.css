@@ -1,0 +1,279 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: block;
+  /* Grupo propio en las transiciones de vista: queda por encima del contenido que cambia. */
+  view-transition-name: cabecera;
+}
+
+.cab {
+  position: relative;
+  border-bottom: 1px solid var(--c-borde);
+  background: var(--c-superficie);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .cab {
+    background: color-mix(in srgb, var(--c-superficie) 90%, transparent);
+    backdrop-filter: saturate(1.5) blur(12px);
+  }
+}
+
+.cab__barra {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  min-height: var(--alto-cabecera);
+}
+
+/* ----- Marca ----- */
+
+.cab__marca {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  margin-right: auto;
+  border-radius: var(--r-control);
+  color: inherit;
+  text-decoration: none;
+}
+
+.cab__marca:hover {
+  color: inherit;
+}
+
+.cab__marca-corta {
+  display: none;
+}
+
+/* Angosto y sin sesión: solo isotipo y nombre, para dejar sitio a las dos acciones. */
+@media (max-width: 35.99rem) {
+  .cab__barra--invitado .cab__marca-larga {
+    display: none;
+  }
+
+  .cab__barra--invitado .cab__marca-corta {
+    display: inline-flex;
+  }
+}
+
+/* ----- Navegación ----- */
+
+.cab__nav ul {
+  display: flex;
+  gap: var(--e-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cab__nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: var(--alto-control); /* objetivo táctil de 44 px (docs/diseno.md) */
+  padding: var(--e-2) var(--e-3);
+  border-radius: var(--r-control);
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-1) var(--curva),
+    color var(--dur-1) var(--curva);
+}
+
+.cab__nav a:hover {
+  background: var(--c-superficie-2);
+  color: var(--c-texto);
+}
+
+/* Página actual: fondo de marca + barra de 2 px (≥ 3:1, no solo color de fondo). */
+.cab__nav a.activo {
+  background: var(--c-primario-suave);
+  color: var(--c-primario-fuerte);
+  box-shadow: inset 0 -2px 0 var(--c-primario);
+}
+
+.cab__boton-nav {
+  display: none;
+}
+
+/* Móvil y tableta vertical: botón de menú y panel desplegable bajo la cabecera. */
+@media (max-width: 55.99rem) {
+  .cab__boton-nav {
+    display: inline-flex;
+  }
+
+  .cab__nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    padding: var(--e-3) var(--e-4) var(--e-4);
+    border-bottom: 1px solid var(--c-borde);
+    background: var(--c-superficie);
+    box-shadow: var(--sombra-2);
+  }
+
+  .cab__nav--abierta {
+    display: block;
+    animation: cab-aparece var(--dur-2) var(--curva);
+  }
+
+  .cab__nav ul {
+    flex-direction: column;
+  }
+
+  .cab__nav a {
+    display: flex;
+    min-height: var(--alto-control);
+    font-size: var(--t-16);
+  }
+
+  .cab__nav a.activo {
+    box-shadow: inset 3px 0 0 var(--c-primario);
+  }
+}
+
+@media (min-width: 56rem) {
+  .cab__marca {
+    flex: none;
+    margin-right: var(--e-4);
+  }
+
+  .cab__zona-nav {
+    flex: 1 1 auto;
+  }
+}
+
+/* ----- Chip y menú de usuario ----- */
+
+.cab__usuario {
+  position: relative;
+}
+
+.cab__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  min-height: var(--alto-control);
+  padding: var(--e-1) var(--e-3) var(--e-1) var(--e-1);
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-pildora);
+  background: var(--c-superficie);
+  color: var(--c-texto);
+  cursor: pointer;
+  transition:
+    background-color var(--dur-1) var(--curva),
+    border-color var(--dur-1) var(--curva);
+}
+
+.cab__chip:hover,
+.cab__chip[aria-expanded='true'] {
+  border-color: var(--c-primario-borde);
+  background: var(--c-superficie-2);
+}
+
+.cab__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 50%;
+  background: var(--c-primario-suave);
+  color: var(--c-primario-fuerte);
+  font-size: var(--t-13);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.cab__persona {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.cab__nombre {
+  max-width: 12rem;
+  overflow: hidden;
+  font-size: var(--t-14);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cab__rol {
+  color: var(--c-texto-2);
+  font-size: var(--t-12);
+}
+
+.cab__chevron {
+  color: var(--c-texto-2);
+  transition: transform var(--dur-1) var(--curva);
+}
+
+.cab__chip[aria-expanded='true'] .cab__chevron {
+  transform: rotate(180deg);
+}
+
+/* Por debajo de 75rem el chip muestra solo las iniciales (el nombre sigue para lectores),
+   para que la navegación quepa en una línea también en tabletas y portátiles pequeños. */
+@media (max-width: 74.99rem) {
+  .cab__chip {
+    padding: var(--e-1);
+  }
+
+  .cab__persona {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .cab__chevron {
+    display: none;
+  }
+}
+
+/* ----- Estado del cierre de sesión ----- */
+
+.cab__estado {
+  margin: 0;
+}
+
+.cab__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  margin: 0 0 var(--e-3);
+  padding: var(--e-3) var(--e-4);
+  border: 1px solid color-mix(in srgb, var(--c-error) 35%, transparent);
+  border-radius: var(--r-control);
+  background: var(--c-error-suave);
+  color: var(--c-error);
+  font-size: var(--t-14);
+  font-weight: 600;
+}
+
+@keyframes cab-aparece {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+@media (forced-colors: active) {
+  .cab__nav a.activo {
+    outline: 2px solid Highlight;
+  }
+}

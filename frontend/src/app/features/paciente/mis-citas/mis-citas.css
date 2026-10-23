@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.destacada {
+  margin-bottom: var(--e-8);
+}
+
+/* Pestañas segmentadas: a todo el ancho en móvil, compactas desde 36rem. */
+.pestanas {
+  margin-bottom: var(--e-6);
+}
+
+@media (min-width: 36rem) {
+  .pestanas {
+    display: inline-flex;
+  }
+
+  .pestanas > .segmentado__opcion {
+    flex: none;
+    min-width: 8.5rem;
+  }
+}
+
+.panel {
+  border-radius: var(--r-tarjeta);
+}
+
+.panel:focus-visible {
+  outline-offset: 6px;
+}
+
+.panel__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-2) var(--e-4);
+  min-height: 1.75rem;
+  margin-bottom: var(--e-4);
+}
+
+.panel__titulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin: 0;
+  font-size: var(--t-18);
+  font-weight: 650;
+}
+
+.panel__nota {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  margin: 0;
+  color: var(--c-texto-2);
+  --icono-tamano: 1.25rem;
+}
+
+.panel__nota app-icono {
+  color: var(--c-acento);
+}
+
+/* Indicador discreto de revalidación (no se anuncia: es solo visual). */
+.actualizando {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+  font-weight: 500;
+  --icono-tamano: 0.875rem;
+}
+
+.actualizando app-icono {
+  animation: girar 1s linear infinite;
+}
+
+.rejilla > li {
+  min-width: 0;
+}
+
+.privacidad {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--e-2);
+  max-width: 44rem;
+  margin: var(--e-10) 0 0;
+  --icono-tamano: 1rem;
+}
+
+.privacidad app-icono {
+  margin-top: 0.125rem;
+  color: var(--c-acento);
+}
+
+/* Estado vacío: «Reservar cita» y «Ver mi historial» centrados. */
+.vacio-acciones {
+  justify-content: center;
+}

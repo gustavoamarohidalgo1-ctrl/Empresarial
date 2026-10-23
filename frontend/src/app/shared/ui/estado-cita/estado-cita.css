@@ -1,0 +1,81 @@
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.estado {
+  --estado-color: var(--c-texto-2);
+  --estado-fondo: var(--c-superficie-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.1875rem 0.75rem 0.1875rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--estado-color) 22%, transparent);
+  border-radius: var(--r-pildora);
+  background: var(--estado-fondo);
+  color: var(--estado-color);
+  font-size: var(--t-13);
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.estado__icono {
+  --icono-tamano: 1rem;
+}
+
+.estado--sm {
+  gap: 0.25rem;
+  padding: 0.0625rem 0.5rem 0.0625rem 0.375rem;
+  font-size: var(--t-12);
+}
+
+.estado--sm .estado__icono {
+  --icono-tamano: 0.875rem;
+}
+
+[data-estado='PENDIENTE'] {
+  --estado-color: var(--estado-pendiente);
+  --estado-fondo: var(--estado-pendiente-fondo);
+}
+
+[data-estado='CONFIRMADA'] {
+  --estado-color: var(--estado-confirmada);
+  --estado-fondo: var(--estado-confirmada-fondo);
+}
+
+[data-estado='CHECK_IN'] {
+  --estado-color: var(--estado-llegada);
+  --estado-fondo: var(--estado-llegada-fondo);
+}
+
+[data-estado='EN_ESPERA'] {
+  --estado-color: var(--estado-espera);
+  --estado-fondo: var(--estado-espera-fondo);
+}
+
+[data-estado='EN_ATENCION'] {
+  --estado-color: var(--estado-atencion);
+  --estado-fondo: var(--estado-atencion-fondo);
+}
+
+[data-estado='COMPLETADA'] {
+  --estado-color: var(--estado-completada);
+  --estado-fondo: var(--estado-completada-fondo);
+}
+
+[data-estado='CANCELADA'] {
+  --estado-color: var(--estado-cancelada);
+  --estado-fondo: var(--estado-cancelada-fondo);
+}
+
+[data-estado='NO_ASISTIO'] {
+  --estado-color: var(--estado-no-asistio);
+  --estado-fondo: var(--estado-no-asistio-fondo);
+}
+
+@media (forced-colors: active) {
+  .estado {
+    border-color: CanvasText;
+  }
+}

@@ -1,0 +1,199 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+/* Colores de serie: tokens de estado (se redefinen solos en modo oscuro). */
+[data-serie='completadas'] {
+  --serie: var(--estado-completada);
+}
+
+[data-serie='noAsistio'] {
+  --serie: var(--estado-no-asistio);
+}
+
+[data-serie='canceladas'] {
+  --serie: var(--estado-cancelada);
+}
+
+[data-serie='resto'] {
+  --serie: var(--c-primario-borde);
+}
+
+.serie {
+  fill: var(--serie);
+}
+
+.trama {
+  fill: none;
+  stroke: var(--c-superficie);
+  stroke-width: 1.25;
+  stroke-linecap: butt;
+}
+
+.gd {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+}
+
+/* ----- Leyenda ----- */
+
+.gd__leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e-2) var(--e-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+}
+
+.gd__leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.gd__muestra {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+}
+
+.gd__leyenda-total {
+  color: var(--c-texto);
+  font-weight: 600;
+}
+
+/* ----- Lienzo ----- */
+
+.gd__lienzo {
+  position: relative;
+  min-width: 0;
+  overflow: visible;
+}
+
+.gd__svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.gd__rejilla {
+  stroke: var(--c-borde);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.gd__rejilla--base {
+  stroke: var(--c-borde-control);
+}
+
+.gd__marca {
+  fill: var(--c-texto-2);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.gd__columna {
+  cursor: default;
+  outline: none;
+}
+
+.gd__zona {
+  fill: transparent;
+}
+
+.gd__columna--activa .gd__zona {
+  fill: var(--c-primario-tenue);
+}
+
+.gd__columna:focus-visible .gd__zona {
+  stroke: var(--c-foco);
+  stroke-width: 3;
+}
+
+/* ----- Tooltip (no tapa la columna: va a su costado) ----- */
+
+.gd__tooltip {
+  position: absolute;
+  z-index: 2;
+  width: 13rem;
+  padding: var(--e-3);
+  border: 1px solid var(--c-borde);
+  border-radius: var(--r-control);
+  background: var(--c-superficie-elevada);
+  box-shadow: var(--sombra-3);
+  font-size: var(--t-13);
+  pointer-events: none;
+}
+
+.gd__tooltip--izquierda {
+  transform: translateX(-100%);
+}
+
+.gd__tooltip-titulo {
+  margin: 0 0 var(--e-2);
+  font-weight: 600;
+}
+
+.gd__tooltip-filas {
+  display: grid;
+  gap: var(--e-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gd__tooltip-filas li {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.gd__tooltip-valor {
+  min-width: 2.25rem;
+  color: var(--c-texto);
+  font-weight: 700;
+  text-align: right;
+}
+
+.gd__tooltip-etiqueta {
+  color: var(--c-texto-2);
+}
+
+.gd__clave {
+  width: 0.75rem;
+  height: 0.1875rem;
+  flex: none;
+  border-radius: 2px;
+  background: var(--serie);
+}
+
+.gd__tooltip-total {
+  margin: var(--e-2) 0 0;
+  padding-top: var(--e-2);
+  border-top: 1px solid var(--c-borde);
+  font-weight: 600;
+}
+
+.gd__celda-fecha {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (forced-colors: active) {
+  .serie {
+    fill: CanvasText;
+  }
+
+  .trama {
+    stroke: Canvas;
+  }
+
+  .gd__columna:focus-visible .gd__zona {
+    stroke: Highlight;
+  }
+}

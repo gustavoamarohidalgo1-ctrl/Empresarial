@@ -1,0 +1,246 @@
+@if (cancelada(); as cc) {
+  <section class="tarjeta centrada" aria-labelledby="titulo-resultado">
+    <div class="resultado__cabecera">
+      <span class="sello sello--exito" aria-hidden="true"><app-icono nombre="check-circle" /></span>
+      <h1 id="titulo-resultado" #tituloResultado tabindex="-1" class="resultado__titulo">
+        Cita cancelada
+      </h1>
+    </div>
+    <div role="status">
+      <app-aviso tipo="exito">
+        <p>La cita {{ cc.codigo }} quedó cancelada y su horario se liberó.</p>
+      </app-aviso>
+    </div>
+    <dl class="lista-datos bloque-datos">
+      <dt>Cita</dt>
+      <dd>{{ cc.codigo }}</dd>
+      <dt>Estado</dt>
+      <dd><app-estado-cita tamano="sm" [estado]="cc.estado" [etiqueta]="cc.estadoEtiqueta" /></dd>
+      <dt>Horario que tenía</dt>
+      <dd>{{ cc.inicio | fechaLima }} (hora de Lima)</dd>
+      <dt>Motivo</dt>
+      <dd>{{ cc.motivoCancelacion?.descripcion ?? motivoElegido()?.descripcion }}</dd>
+      @if (canceladaEn(); as en) {
+        <dt>Cancelada el</dt>
+        <dd>
+          <time [attr.datetime]="en">{{ en | fechaLima }}</time>
+        </dd>
+      }
+    </dl>
+    <p class="texto-suave texto-sm">La encontrarás en la pestaña Historial de Mis citas.</p>
+    <div class="acciones tarjeta__pie">
+      <a class="btn btn--primario" routerLink="/paciente/citas">
+        <app-icono nombre="arrow-left" /> Volver a Mis citas
+      </a>
+      <a class="btn" routerLink="/paciente/citas" [queryParams]="{ alcance: 'historial' }">
+        <app-icono nombre="clock" /> Ver historial
+      </a>
+    </div>
+  </section>
+} @else {
+  <app-encabezado-pagina titulo="Cancelar cita" [subtitulo]="subtitulo()" [migas]="migas()">
+    @if (cita(); as c) {
+      <app-estado-cita junto-al-titulo tamano="sm" [estado]="c.estado" [etiqueta]="c.estadoEtiqueta" />
+    }
+  </app-encabezado-pagina>
+
+  @switch (estadoCarga()) {
+    @case ('cargando') {
+      <div aria-busy="true">
+        <p class="solo-lectores" role="status">Cargando la cita…</p>
+        <div class="tarjeta centrada pila" aria-hidden="true">
+          <div class="fila esqueleto-cita">
+            <app-esqueleto forma="bloque" ancho="3.75rem" alto="4.75rem" />
+            <div class="esqueleto-cita__texto">
+              <app-esqueleto forma="titulo" ancho="45%" />
+              <app-esqueleto ancho="85%" />
+            </div>
+          </div>
+          <app-esqueleto forma="titulo" ancho="60%" />
+          <app-esqueleto forma="bloque" alto="5.5rem" />
+          <app-esqueleto ancho="30%" />
+          <app-esqueleto forma="boton" />
+          <app-esqueleto forma="bloque" alto="3.25rem" />
+          <app-esqueleto forma="boton" ancho="14rem" />
+        </div>
+      </div>
+    }
+    @case ('no-encontrada') {
+      <div class="tarjeta centrada" role="alert">
+        <app-estado-vacio
+          ilustracion="busqueda"
+          titulo="No encontramos esta cita"
+          texto="Puede que no exista o que no pertenezca a tu cuenta."
+        >
+          <a acciones class="btn btn--primario" routerLink="/paciente/citas">
+            <app-icono nombre="arrow-left" /> Volver a Mis citas
+          </a>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('error') {
+      <div class="tarjeta centrada" role="alert">
+        <app-estado-vacio
+          ilustracion="error"
+          titulo="No pudimos cargar la información"
+          [texto]="errorCarga()"
+        >
+          <button acciones type="button" class="btn" (click)="cargar()">
+            <app-icono nombre="refresh-cw" /> Reintentar
+          </button>
+        </app-estado-vacio>
+      </div>
+    }
+    @case ('listo') {
+      @if (cita(); as c) {
+        <div class="centrada" aria-live="polite" aria-atomic="true">
+          @if (mensaje(); as m) {
+            <div #avisoResultado class="foco-resultado" tabindex="-1">
+              <app-aviso [tipo]="m.tipo" [titulo]="m.titulo">
+                <p>{{ m.texto }}</p>
+                @if (m.reintentar || m.actualizar) {
+                  <div class="acciones">
+                    @if (m.reintentar) {
+                      <button
+                        type="button"
+                        class="btn btn--primario"
+                        [class.btn--cargando]="enviando()"
+                        (click)="cancelar()"
+                        [disabled]="enviando()"
+                      >
+                        <app-icono nombre="refresh-cw" /> Reintentar
+                      </button>
+                    }
+                    @if (m.actualizar) {
+                      <button type="button" class="btn" (click)="actualizar()">
+                        <app-icono nombre="refresh-cw" /> Actualizar vista
+                      </button>
+                    }
+                  </div>
+                }
+              </app-aviso>
+            </div>
+          }
+        </div>
+
+        @if (desactualizada()) {
+          <div class="centrada">
+            <app-aviso tipo="advertencia" titulo="Mostramos lo último que cargamos">
+              <p>No pudimos actualizar los datos de la cita. Revisa tu conexión e inténtalo de nuevo.</p>
+              <div class="acciones">
+                <button type="button" class="btn btn--sm" (click)="actualizar()">
+                  <app-icono nombre="refresh-cw" /> Actualizar
+                </button>
+              </div>
+            </app-aviso>
+          </div>
+        }
+
+        @if (!permitido()) {
+          <div class="tarjeta centrada">
+            <app-estado-vacio
+              ilustracion="calendario"
+              titulo="Esta cita no se puede cancelar"
+              [texto]="
+                'En su estado actual (' + c.estadoEtiqueta + '), la cita ya no admite cancelación.'
+              "
+            >
+              <a acciones class="btn" [routerLink]="['/paciente/citas', c.id]">
+                <app-icono nombre="arrow-left" /> Volver al detalle
+              </a>
+            </app-estado-vacio>
+          </div>
+        } @else {
+          <section class="tarjeta centrada" aria-labelledby="titulo-cancelar">
+            <app-resumen-cita class="cita" [cita]="c" />
+
+            <div class="consecuencia">
+              <span class="sello sello--peligro" aria-hidden="true"
+                ><app-icono nombre="calendar-x"
+              /></span>
+              <div>
+                <h2 id="titulo-cancelar" class="consecuencia__titulo">Confirma la cancelación</h2>
+                <p class="texto-suave sin-margen">Revisa qué pasará antes de confirmar.</p>
+              </div>
+            </div>
+
+            <app-aviso tipo="advertencia" titulo="Antes de continuar">
+              <p id="advertencia-cancelacion">{{ textoAdvertencia }}</p>
+              <ul class="consecuencias">
+                <li>Su horario se liberará para otra persona.</li>
+                <li>La encontrarás en la pestaña Historial de Mis citas.</li>
+              </ul>
+            </app-aviso>
+
+            <div class="campo">
+              <label for="motivo-cancelacion">Motivo de la cancelación</label>
+              <select
+                id="motivo-cancelacion"
+                class="control"
+                (change)="elegirMotivo($event)"
+                [disabled]="enviando()"
+                required
+                aria-describedby="motivo-cancelacion-ayuda"
+              >
+                <option value="" [selected]="!motivoCodigo()">Elige un motivo</option>
+                @for (m of motivos(); track m.codigo) {
+                  <option [value]="m.codigo" [selected]="m.codigo === motivoCodigo()">
+                    {{ m.descripcion }}
+                  </option>
+                }
+              </select>
+              <p id="motivo-cancelacion-ayuda" class="ayuda">
+                Obligatorio. Elige la opción que mejor describa tu caso.
+              </p>
+            </div>
+
+            <label class="casilla" for="comprendo-cancelacion">
+              <input
+                id="comprendo-cancelacion"
+                type="checkbox"
+                [checked]="comprendo()"
+                (change)="cambiarComprendo($event)"
+                [disabled]="enviando()"
+                aria-describedby="advertencia-cancelacion"
+              />
+              <span>{{ textoCasilla }}</span>
+            </label>
+
+            <div class="acciones tarjeta__pie">
+              <button
+                type="button"
+                class="btn btn--peligro"
+                [class.btn--cargando]="enviando()"
+                (click)="cancelar()"
+                [disabled]="!!faltante() || enviando() || revalidando()"
+                [attr.aria-describedby]="
+                  enviando() || revalidando()
+                    ? 'explicacion-cancelando'
+                    : faltante()
+                      ? 'explicacion-cancelar'
+                      : null
+                "
+              >
+                <app-icono nombre="calendar-x" /> Confirmar cancelación
+              </button>
+              <a class="btn" [routerLink]="['/paciente/citas', c.id]">
+                <app-icono nombre="arrow-left" /> Volver al detalle
+              </a>
+            </div>
+            @if (enviando()) {
+              <p id="explicacion-cancelando" class="explicacion-deshabilitado" role="status">
+                Cancelando la cita. Espera un momento.
+              </p>
+            } @else if (revalidando()) {
+              <p id="explicacion-cancelando" class="explicacion-deshabilitado">
+                Comprobando los datos más recientes de la cita…
+              </p>
+            } @else if (faltante()) {
+              <p id="explicacion-cancelar" class="explicacion-deshabilitado">{{ faltante() }}</p>
+            }
+          </section>
+        }
+      }
+    }
+  }
+}

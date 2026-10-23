@@ -1,0 +1,271 @@
+:host {
+  display: block;
+}
+
+.bit__subtitulo {
+  --icono-tamano: 1.125rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-2);
+  margin: 0;
+  font-size: var(--t-18);
+}
+
+/* ----- Filtros ----- */
+
+.bit__filtros {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-4);
+}
+
+.bit__formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  align-items: start;
+  gap: var(--e-3) var(--e-4);
+}
+
+.bit__campo {
+  margin: 0;
+}
+
+.bit__acciones {
+  grid-column: 1 / -1;
+}
+
+/* El correo ocupa dos columnas solo cuando la rejilla tiene al menos dos. */
+@media (min-width: 40rem) {
+  .bit__campo--ancho {
+    grid-column: span 2;
+  }
+}
+
+/* ----- Resultados y detalle ----- */
+
+.bit__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--e-5);
+}
+
+.bit__resultados {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-3);
+  min-width: 0;
+}
+
+.bit__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--e-1) var(--e-4);
+}
+
+.bit__meta {
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+}
+
+.bit__actualizando {
+  color: var(--c-primario);
+  font-weight: 600;
+}
+
+/* Debajo de 80rem el detalle va primero (el foco lo lleva a la vista). */
+.bit__detalle {
+  order: -1;
+}
+
+@media (min-width: 80rem) {
+  .bit__cuerpo--con-detalle {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+
+  .bit__detalle {
+    order: 0;
+    position: sticky;
+    top: calc(var(--alto-cabecera) + var(--e-4));
+  }
+
+  /* Con el panel abierto, la entidad y el ID de solicitud se leen en el panel. */
+  .bit__cuerpo--con-detalle .bit__col-opcional {
+    display: none;
+  }
+}
+
+/* ----- Tabla densa ----- */
+
+@media (min-width: 56.0625rem) {
+  .bit__tabla th,
+  .bit__tabla td {
+    padding: var(--e-2) var(--e-3);
+    vertical-align: top;
+  }
+
+  .bit__tabla thead th {
+    padding-block: var(--e-3);
+  }
+}
+
+.bit__fila {
+  cursor: pointer;
+}
+
+.bit__fila--activa,
+.bit__fila--activa:hover {
+  background: var(--c-primario-suave);
+  box-shadow: inset 3px 0 0 var(--c-primario);
+}
+
+.bit__fecha,
+.bit__principal,
+.bit__secundario {
+  display: flex;
+  flex-direction: column;
+}
+
+.bit__fecha {
+  white-space: nowrap;
+}
+
+.bit__principal {
+  --icono-tamano: 1rem;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--e-1);
+  font-weight: 500;
+}
+
+.bit__icono-actor {
+  color: var(--c-texto-2);
+}
+
+.bit__secundario {
+  color: var(--c-texto-2);
+  font-size: var(--t-13);
+}
+
+.bit__codigo {
+  display: block;
+  margin-top: 0.125rem;
+  color: var(--c-texto-2);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: var(--t-12);
+  overflow-wrap: anywhere;
+}
+
+.bit__codigo--solicitud {
+  display: inline;
+  margin: 0;
+  color: var(--c-texto);
+}
+
+.bit__copiable {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-1);
+  white-space: nowrap;
+}
+
+.bit__celda-detalle {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.bit__atenuada {
+  opacity: 0.55;
+  transition: opacity var(--dur-2) var(--curva);
+}
+
+.bit__vacio {
+  padding-block: var(--e-8);
+}
+
+/* ----- Paginación ----- */
+
+.bit__paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3) var(--e-5);
+  padding-top: var(--e-2);
+}
+
+.bit__rango {
+  margin: 0;
+  color: var(--c-texto-2);
+  font-size: var(--t-14);
+}
+
+.bit__rango strong {
+  color: var(--c-texto);
+}
+
+.bit__paginas,
+.bit__tamano {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+}
+
+.bit__pagina-actual {
+  padding-inline: var(--e-2);
+  font-size: var(--t-14);
+  font-weight: 600;
+}
+
+.bit__tamano label {
+  font-size: var(--t-14);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bit__tamano .control {
+  width: auto;
+  min-width: 5.5rem;
+}
+
+/* Tarjetas (móvil): la fila elegida conserva su marca; el botón ocupa el ancho. */
+@media (max-width: 56rem) {
+  .bit__fila--activa,
+  .bit__fila--activa:hover {
+    box-shadow:
+      inset 3px 0 0 var(--c-primario),
+      var(--sombra-1);
+  }
+
+  .bit__fecha,
+  .bit__principal,
+  .bit__secundario {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0 var(--e-2);
+  }
+
+  .bit__codigo {
+    display: inline;
+    margin-left: var(--e-1);
+  }
+
+  .bit__celda-detalle {
+    padding-top: var(--e-2);
+    text-align: left;
+  }
+
+  .bit__celda-detalle .btn {
+    width: 100%;
+  }
+
+  .bit__paginas {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+}
